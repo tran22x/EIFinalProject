@@ -1,5 +1,7 @@
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map.Entry;
 
 import edu.mtholyoke.cs.comsc243.kinect.Body;
 import edu.mtholyoke.cs.comsc243.kinect.KinectBodyData;
@@ -19,9 +21,9 @@ public class KinectRenderDemo extends PApplet {
 	public static int PROJECTOR_WIDTH = 1024;
 	public static int PROJECTOR_HEIGHT = 786;
 	private Calibrator calibrator;
-	PersonTracker tracker;
+	private PersonTracker tracker;
 
-	HashMap<Long, Person> people = new HashMap<Long, Person>();
+	private HashMap<Long, Person> people = new HashMap<Long, Person>();
 
 	TCPBodyReceiver kinectReader;
 	public static float PROJECTOR_RATIO = (float)PROJECTOR_HEIGHT/(float)PROJECTOR_WIDTH;
@@ -66,6 +68,7 @@ public class KinectRenderDemo extends PApplet {
 			System.out.println("Unable to creat e kinect producer");
 		}
 		 */
+		tracker = new PersonTracker();	
 		
 		kinectReader = new TCPBodyReceiver("138.110.92.93", 8008);
 		try {
@@ -100,47 +103,73 @@ public class KinectRenderDemo extends PApplet {
 //		KinectBodyData bodyData = kinectReader.getMostRecentData();
 		KinectBodyData bodyData = kinectReader.getNextData();
 		if(bodyData == null) return;
-		Body person = bodyData.getPerson(0);
-		if(person != null){
-			PVector head = person.getJoint(Body.HEAD);
-			PVector spine = person.getJoint(Body.SPINE_SHOULDER);
-			PVector spineBase = person.getJoint(Body.SPINE_BASE);
-			PVector shoulderLeft = person.getJoint(Body.SHOULDER_LEFT);
-			PVector shoulderRight = person.getJoint(Body.SHOULDER_RIGHT);
-			PVector footLeft = person.getJoint(Body.FOOT_LEFT);
-			PVector footRight = person.getJoint(Body.FOOT_RIGHT);
-			PVector handLeft = person.getJoint(Body.HAND_LEFT);
-			PVector handRight = person.getJoint(Body.HAND_RIGHT);
-			PVector elbowLeft = person.getJoint(Body.ELBOW_LEFT);
-			PVector elbowRight = person.getJoint(Body.ELBOW_RIGHT);
+//		Body person = bodyData.getPerson(0);
+//		if(person != null){
+//			PVector head = person.getJoint(Body.HEAD);
+//			PVector spine = person.getJoint(Body.SPINE_SHOULDER);
+//			PVector spineBase = person.getJoint(Body.SPINE_BASE);
+//			PVector shoulderLeft = person.getJoint(Body.SHOULDER_LEFT);
+//			PVector shoulderRight = person.getJoint(Body.SHOULDER_RIGHT);
+//			PVector footLeft = person.getJoint(Body.FOOT_LEFT);
+//			PVector footRight = person.getJoint(Body.FOOT_RIGHT);
+//			PVector handLeft = person.getJoint(Body.HAND_LEFT);
+//			PVector handRight = person.getJoint(Body.HAND_RIGHT);
+//			PVector elbowLeft = person.getJoint(Body.ELBOW_LEFT);
+//			PVector elbowRight = person.getJoint(Body.ELBOW_RIGHT);
+//
+//
+//			fill(255,0,0);
+//			noStroke();
+//			drawIfValid(head);
+//			drawIfValid(spineBase);
+//			
+//			PVector t1 = calibrator.transformPoint(head);
+//			fill (0,0,0);
+//			drawIfValid(t1);
+//
+//			if( 
+//					(footRight != null) &&
+//					(footLeft != null) &&
+//					(handLeft != null) &&
+//					(handRight != null) 
+//					) {
+//				stroke(255,0,0, 100);
+//				noFill();
+//				strokeWeight(.05f); // because of scale weight needs to be much thinner
+//				quad(footLeft.x, footLeft.y, 
+//						handLeft.x, handLeft.y, 
+//						handRight.x, handRight.y,
+//						footRight.x, footRight.y);
+//			}
 
+		if(bodyData != null) {
+			tracker.update(bodyData);
 
-			fill(255,0,0);
-			noStroke();
-			drawIfValid(head);
-			drawIfValid(spineBase);
-			
-			PVector t1 = calibrator.transformPoint(head);
-			fill (0,0,0);
-			drawIfValid(t1);
-
-			if( 
-					(footRight != null) &&
-					(footLeft != null) &&
-					(handLeft != null) &&
-					(handRight != null) 
-					) {
-				stroke(255,0,0, 100);
-				noFill();
-				strokeWeight(.05f); // because of scale weight needs to be much thinner
-				quad(footLeft.x, footLeft.y, 
-						handLeft.x, handLeft.y, 
-						handRight.x, handRight.y,
-						footRight.x, footRight.y);
+			for(Long id : tracker.getEnters()) {
+				people.put(id, new Person(id, this));
+			}
+			for(Long id: tracker.getExits()) {
+				people.remove(id);
 			}
 
+			HashMap<Long, Body> idBodyMap = tracker.getPeople();
+
+			for(Entry<Long, Body> entry : idBodyMap.entrySet()) {
+				Body body = entry.getValue();
+				Person person = people.get(entry.getKey());
+
+				if(body != null) {
+					PVector head = body.getJoint(Body.HEAD);
+					if(head != null) {
+						PVector t1 = calibrator.transformPoint(head);
+						person.setLocation(t1);
+					}
+				}
+
+				person.draw(this);
+			}
 		}
-	}
+		}
 
 	/**
 	 * Draws an ellipse in the x,y position of the vector (it ignores z).
