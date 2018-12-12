@@ -19,8 +19,8 @@ public class Person {
 	
 	public void draw(PApplet app) {
 		app.fill(color);
-		app.ellipse(loc.x, loc.y, radius*2, radius*2);
-		
+		app.ellipse(loc.x, loc.z, 0.08f, 0.08f);
+		//System.out.println("Loc z: " + loc.z);
 	}
 
 }

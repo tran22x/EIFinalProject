@@ -53,7 +53,7 @@ public class KinectRenderDemo extends PApplet {
 	}
 
 	public void settings() {
-		createWindow(true, false, .5f);
+		createWindow(true, false, .8f);
 	}
 
 	public void setup(){
@@ -87,7 +87,7 @@ public class KinectRenderDemo extends PApplet {
 
 	}
 	public void draw(){
-		setScale(.5f);
+		setScale(.4f);
 		
 		noStroke();
 
@@ -157,16 +157,22 @@ public class KinectRenderDemo extends PApplet {
 			for(Entry<Long, Body> entry : idBodyMap.entrySet()) {
 				Body body = entry.getValue();
 				Person person = people.get(entry.getKey());
+				PVector head = null;
+				PVector t1 = null;
 
 				if(body != null) {
-					PVector head = body.getJoint(Body.HEAD);
+					head = body.getJoint(Body.HEAD);
 					if(head != null) {
-						PVector t1 = calibrator.transformPoint(head);
+						t1 = calibrator.transformPoint(head);
 						person.setLocation(t1);
+						
 					}
 				}
-
-				person.draw(this);
+				if (person!= null) {
+					person.draw(this);
+				}
+				drawIfValid(head);
+				
 			}
 		}
 		}
@@ -179,6 +185,7 @@ public class KinectRenderDemo extends PApplet {
 	 */
 	public void drawIfValid(PVector vec) {
 		if(vec != null) {
+			fill(0,0,0);
 			ellipse(vec.x, vec.y, .1f,.1f);
 		}
 
