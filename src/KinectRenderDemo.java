@@ -4,8 +4,11 @@ import java.io.IOException;
 import edu.mtholyoke.cs.comsc243.kinect.Body;
 import edu.mtholyoke.cs.comsc243.kinect.KinectBodyData;
 import edu.mtholyoke.cs.comsc243.kinectTCP.TCPBodyReceiver;
+import edu.mtholyoke.cs.comsc243em.emendelo.calibration.Calibrator;
 import processing.core.PApplet;
 import processing.core.PVector;
+import edu.mtholyoke.cs.comsc243.kinect.KinectBodyData;
+import edu.mtholyoke.cs.comsc243.kinect.PersonTracker;
 
 /**
  * @author eitan
@@ -15,6 +18,10 @@ public class KinectRenderDemo extends PApplet {
 	
 	public static int PROJECTOR_WIDTH = 1024;
 	public static int PROJECTOR_HEIGHT = 786;
+	private Calibrator calibrator;
+	PersonTracker tracker;
+
+	HashMap<Long, Person> people = new HashMap<Long, Person>();
 
 	TCPBodyReceiver kinectReader;
 	public static float PROJECTOR_RATIO = (float)PROJECTOR_HEIGHT/(float)PROJECTOR_WIDTH;
@@ -67,6 +74,13 @@ public class KinectRenderDemo extends PApplet {
 			System.out.println("Unable to connect to kinect server");
 			exit();
 		}
+		try {
+			calibrator = new  Calibrator(kinectReader, "office.calibration");
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
 
 	}
 	public void draw(){
@@ -101,19 +115,14 @@ public class KinectRenderDemo extends PApplet {
 			PVector elbowRight = person.getJoint(Body.ELBOW_RIGHT);
 
 
-			fill(255,255,255);
+			fill(255,0,0);
 			noStroke();
 			drawIfValid(head);
-			drawIfValid(spine);
 			drawIfValid(spineBase);
-			drawIfValid(shoulderLeft);
-			drawIfValid(shoulderRight);
-			drawIfValid(footLeft);
-			drawIfValid(footRight);
-			drawIfValid(handLeft);
-			drawIfValid(handRight);
-			drawIfValid(elbowLeft);
-			drawIfValid(elbowRight);
+			
+			PVector t1 = calibrator.transformPoint(head);
+			fill (0,0,0);
+			drawIfValid(t1);
 
 			if( 
 					(footRight != null) &&
@@ -128,14 +137,6 @@ public class KinectRenderDemo extends PApplet {
 						handLeft.x, handLeft.y, 
 						handRight.x, handRight.y,
 						footRight.x, footRight.y);
-				//triangle(head.x, head.y, shoulderLeft.x, shoulderLeft.y, shoulderRight.x, shoulderRight.y);
-//				curve(
-//						footLeft.x, footLeft.y, 
-//						handLeft.x, handLeft.y, 
-//						handRight.x, handRight.y,
-//						footRight.x, footRight.y
-//						);
-
 			}
 
 		}

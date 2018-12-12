@@ -4,5 +4,6 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/kinect"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/processing"/>
+	<classpathentry kind="lib" path="/Users/olive/Documents/Calibrate.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
