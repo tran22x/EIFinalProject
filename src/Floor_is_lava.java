@@ -1,11 +1,11 @@
-
-
-
 import processing.core.PVector;
 
 public class floor_is_lava {
+	//location of two person
 	PVector person1;
 	PVector person2;
+	
+	//time when to add new lava on the floor
 	int timer;
 
 	public void resetGame() {
