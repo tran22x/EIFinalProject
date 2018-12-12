@@ -1,6 +1,7 @@
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.Map.Entry;
 
 import edu.mtholyoke.cs.comsc243.kinect.Body;
@@ -9,7 +10,6 @@ import edu.mtholyoke.cs.comsc243.kinectTCP.TCPBodyReceiver;
 import edu.mtholyoke.cs.comsc243em.emendelo.calibration.Calibrator;
 import processing.core.PApplet;
 import processing.core.PVector;
-import edu.mtholyoke.cs.comsc243.kinect.KinectBodyData;
 import edu.mtholyoke.cs.comsc243.kinect.PersonTracker;
 
 /**
@@ -22,8 +22,12 @@ public class KinectRenderDemo extends PApplet {
 	public static int PROJECTOR_HEIGHT = 786;
 	private Calibrator calibrator;
 	private PersonTracker tracker;
+	private int numPeople = 0;
+	private boolean invalidated = false;
 
 	private HashMap<Long, Person> people = new HashMap<Long, Person>();
+	//private LinkedList<PVector> lastPos;
+	
 
 	TCPBodyReceiver kinectReader;
 	public static float PROJECTOR_RATIO = (float)PROJECTOR_HEIGHT/(float)PROJECTOR_WIDTH;
@@ -78,7 +82,7 @@ public class KinectRenderDemo extends PApplet {
 			exit();
 		}
 		try {
-			calibrator = new  Calibrator(kinectReader, "office.calibration");
+			calibrator = new  Calibrator(kinectReader, "none.calibration");
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -144,11 +148,16 @@ public class KinectRenderDemo extends PApplet {
 
 		if(bodyData != null) {
 			tracker.update(bodyData);
-
 			for(Long id : tracker.getEnters()) {
-				people.put(id, new Person(id, this));
+				if (people.size() < 2) { //make sure that there's only 2 ppl in the space
+					people.put(id, new Person(id, this));
+					//numPeople++;
+				}
 			}
 			for(Long id: tracker.getExits()) {
+				if (!people.get(id).isValidated()) { //if the person that walks out is invalidated
+					invalidated = false;
+				}
 				people.remove(id);
 			}
 
@@ -156,7 +165,11 @@ public class KinectRenderDemo extends PApplet {
 
 			for(Entry<Long, Body> entry : idBodyMap.entrySet()) {
 				Body body = entry.getValue();
-				Person person = people.get(entry.getKey());
+				Person person = people.get(entry.getKey()); 
+				if (!invalidated) {
+					person.setValidate(false);//set random person as validated
+					invalidated = true;
+				}
 				PVector head = null;
 				PVector t1 = null;
 
@@ -171,9 +184,13 @@ public class KinectRenderDemo extends PApplet {
 				if (person!= null) {
 					person.draw(this);
 				}
-				drawIfValid(head);
-				
+				//drawIfValid(head);
 			}
+			
+			//1 person started out as invalidated and 1 is validated
+			
+			
+			
 		}
 		}
 
@@ -186,7 +203,7 @@ public class KinectRenderDemo extends PApplet {
 	public void drawIfValid(PVector vec) {
 		if(vec != null) {
 			fill(0,0,0);
-			ellipse(vec.x, vec.y, .1f,.1f);
+			ellipse(vec.x, vec.z, .1f,.1f);
 		}
 
 	}

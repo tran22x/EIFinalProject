@@ -6,6 +6,7 @@ public class Person {
 	PVector loc;
 	int color;
 	float radius;
+	boolean validated = true;
 	
 	public Person(Long id, PApplet app) {
 		this.id = id;
@@ -18,9 +19,23 @@ public class Person {
 	}
 	
 	public void draw(PApplet app) {
-		app.fill(color);
+		if (validated) { //different colours for validated and non validated ppl
+			app.fill(color);
+		}
+		else {
+			app.fill(255,0,0);
+		}
 		app.ellipse(loc.x, loc.z, 0.08f, 0.08f);
 		//System.out.println("Loc z: " + loc.z);
 	}
+	
+	public boolean isValidated() {
+		return validated;
+	}
+	
+	public void setValidate(boolean b) {
+		validated = b;
+	}
+	
 
 }
