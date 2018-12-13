@@ -7,6 +7,7 @@ public class Person {
 	int color;
 	float radius;
 	boolean validated = true;
+	final double THRESHOLD = .2f;//threshold to check if the person is standing at a position
 	
 	public Person(Long id, PApplet app) {
 		this.id = id;
@@ -35,6 +36,17 @@ public class Person {
 	
 	public void setValidate(boolean b) {
 		validated = b;
+	}
+	
+	/**
+	 * Method to check if the person is standing at a specific location
+	 * @param v
+	 */
+	public boolean checkLocation(PVector v) {
+		if (v != null && Math.abs(v.x - loc.x) < THRESHOLD && Math.abs(v.y - loc.z) < THRESHOLD) {
+			return true;
+		}
+		return false;
 	}
 	
 

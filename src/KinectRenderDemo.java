@@ -24,7 +24,9 @@ public class KinectRenderDemo extends PApplet {
 	private PersonTracker tracker;
 	private int numPeople = 0;
 	private boolean invalidated = false;
-
+	private boolean gameStarted = false;
+	private PVector startingPoint1 = null; //startingPoint for first person
+	private PVector startingPoint2 = null;	//startingPoint for second person
 	private HashMap<Long, Person> people = new HashMap<Long, Person>();
 	//private LinkedList<PVector> lastPos;
 	
@@ -87,65 +89,19 @@ public class KinectRenderDemo extends PApplet {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
+		gameSetup(); //setup lava and random positions for people to stand and start
 
 	}
 	public void draw(){
 		setScale(.4f);
 		
 		noStroke();
-
-
-
+		
 		background(200,200,200);
-
-		// leave trails instead of clearing background \ 
-		//noStroke();
-		//fill(0,0,0, 10);
-		//rect(-1,-1, 2, 2); //draw transparent rect of the window
-
-//		KinectBodyData bodyData = kinectReader.getMostRecentData();
 		KinectBodyData bodyData = kinectReader.getNextData();
 		if(bodyData == null) return;
-//		Body person = bodyData.getPerson(0);
-//		if(person != null){
-//			PVector head = person.getJoint(Body.HEAD);
-//			PVector spine = person.getJoint(Body.SPINE_SHOULDER);
-//			PVector spineBase = person.getJoint(Body.SPINE_BASE);
-//			PVector shoulderLeft = person.getJoint(Body.SHOULDER_LEFT);
-//			PVector shoulderRight = person.getJoint(Body.SHOULDER_RIGHT);
-//			PVector footLeft = person.getJoint(Body.FOOT_LEFT);
-//			PVector footRight = person.getJoint(Body.FOOT_RIGHT);
-//			PVector handLeft = person.getJoint(Body.HAND_LEFT);
-//			PVector handRight = person.getJoint(Body.HAND_RIGHT);
-//			PVector elbowLeft = person.getJoint(Body.ELBOW_LEFT);
-//			PVector elbowRight = person.getJoint(Body.ELBOW_RIGHT);
-//
-//
-//			fill(255,0,0);
-//			noStroke();
-//			drawIfValid(head);
-//			drawIfValid(spineBase);
-//			
-//			PVector t1 = calibrator.transformPoint(head);
-//			fill (0,0,0);
-//			drawIfValid(t1);
-//
-//			if( 
-//					(footRight != null) &&
-//					(footLeft != null) &&
-//					(handLeft != null) &&
-//					(handRight != null) 
-//					) {
-//				stroke(255,0,0, 100);
-//				noFill();
-//				strokeWeight(.05f); // because of scale weight needs to be much thinner
-//				quad(footLeft.x, footLeft.y, 
-//						handLeft.x, handLeft.y, 
-//						handRight.x, handRight.y,
-//						footRight.x, footRight.y);
-//			}
-
+		
+		// as of now this is just drawing the people on the screen
 		if(bodyData != null) {
 			tracker.update(bodyData);
 			for(Long id : tracker.getEnters()) {
@@ -166,10 +122,10 @@ public class KinectRenderDemo extends PApplet {
 			for(Entry<Long, Body> entry : idBodyMap.entrySet()) {
 				Body body = entry.getValue();
 				Person person = people.get(entry.getKey()); 
-				if (!invalidated) {
-					person.setValidate(false);//set random person as validated
-					invalidated = true;
-				}
+				//if (!invalidated) {
+					//person.setValidate(false);//set random person as validated
+					//invalidated = true;
+				//}
 				PVector head = null;
 				PVector t1 = null;
 
@@ -184,15 +140,43 @@ public class KinectRenderDemo extends PApplet {
 				if (person!= null) {
 					person.draw(this);
 				}
-				//drawIfValid(head);
 			}
+			if (!gameStarted) {
+				checkGameStart();
+			}
+
 			
-			//1 person started out as invalidated and 1 is validated
-			
-			
-			
+		//game logic goes here
 		}
-		}
+	}
+	
+	/**Method to set up the beginning: Two people are instructed to stand at specific points on the screen. Don't let more than 2 person start */
+	private void gameSetup() {
+		//call method to setup lava
+		
+		//method to setup specific locations for people to stand, make sure that they are different and not too close
+		
+			//startingPoint1 = lava.getRandomPos();
+			//startingPoint2 = lava.getRandomPos();
+	}	
+	
+	/**
+	 * Method to check if players are in position and start the game
+	 */
+	private void checkGameStart() {
+		//check if players are on the instructed position
+		//if(person[1].checkLocation(startingPoint1) && person[2].checkLocation(startingPoint2) ||
+		//person[1].checkLocation(startingPoint2) && person[2].checkLocation(startingPoint1))
+		//if they are
+			//invalidate one person, the other is validated
+				//person[1].setValidate(false);
+				//gameStarted = true;
+	}
+	
+	/**
+	 * 
+	 */
+	
 
 	/**
 	 * Draws an ellipse in the x,y position of the vector (it ignores z).
