@@ -1,4 +1,5 @@
 import java.awt.Color;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -7,13 +8,15 @@ import java.util.Random;
 
 import edu.mtholyoke.cs.comsc243.kinect.Body;
 import edu.mtholyoke.cs.comsc243.kinect.KinectBodyData;
+import edu.mtholyoke.cs.comsc243.kinect.KinectBodyDataProvider;
 import edu.mtholyoke.cs.comsc243.kinectTCP.TCPBodyReceiver;
-import edu.mtholyoke.cs.comsc243em.emendelo.calibration.Calibrator;
 import megamu.mesh.MPolygon;
 import megamu.mesh.Voronoi;
 import processing.core.PApplet;
 import processing.core.PVector;
 import edu.mtholyoke.cs.comsc243.kinect.PersonTracker;
+import edu.mtholyoke.cs.comsc243.kinect.util.KinectMsgHandler;
+import edu.mtholyoke.cs.comsc243.kinectTCP.PoseFileReader;
 
 /**
  * @author eitan
@@ -23,13 +26,9 @@ public class KinectRenderDemo extends PApplet {
 	
 	public static int PROJECTOR_WIDTH = 1024;
 	public static int PROJECTOR_HEIGHT = 786;
-	private Calibrator calibrator;
+	
+	//KinectMsgHandler kinectReader;
 	private PersonTracker tracker;
-	private int numPeople = 0;
-	private boolean invalidated = false;
-	private boolean gameStarted = false;
-	private PVector startingPoint1 = null; //startingPoint for first person
-	private PVector startingPoint2 = null;	//startingPoint for second person
 	private HashMap<Long, Person> people = new HashMap<Long, Person>();
 	private Random random = new Random();
 	private final int NUMLAVA = 100;
@@ -75,13 +74,25 @@ public class KinectRenderDemo extends PApplet {
 		/*
 		 * use this code to run your PApplet from data recorded by recorder 
 		 */
-		/*
-		try {
-			kinectReader = new KinectBodyDataProvider("test.kinect", 10);
-		} catch (IOException e) {
-			System.out.println("Unable to creat e kinect producer");
-		}
-		 */
+		
+//		String filename = "bodyPose.kinect";
+//		int loopCnt = -1; // use negative number to loop forever
+//		try {
+//			System.out.println("Trying to read " + filename + " loops:"  +loopCnt);
+//			kinectReader = new PoseFileReader(filename, loopCnt);
+//		} catch (FileNotFoundException e) {
+//			System.out.println("Unable to open file: " + filename);
+//		}
+//
+//		
+//		try {
+//			kinectReader.start();
+//		} catch (IOException e) {
+//			System.out.println("Unable to start kinect reader");
+//			exit();
+//		}
+
+		 
 		tracker = new PersonTracker();	
 		
 		kinectReader = new TCPBodyReceiver("138.110.92.93", 8008);
@@ -90,12 +101,6 @@ public class KinectRenderDemo extends PApplet {
 		} catch (IOException e) {
 			System.out.println("Unable to connect to kinect server");
 			exit();
-		}
-		try {
-			calibrator = new  Calibrator(kinectReader, "none.calibration");
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		}
 		gameSetup(); //setup lava and random positions for people to stand and start
 
@@ -129,15 +134,9 @@ public class KinectRenderDemo extends PApplet {
 		if(bodyData != null) {
 			tracker.update(bodyData);
 			for(Long id : tracker.getEnters()) {
-				if (people.size() < 2) { //make sure that there's only 2 ppl in the space
 					people.put(id, new Person(id, this));
-					//numPeople++;
-				}
 			}
 			for(Long id: tracker.getExits()) {
-				if (!people.get(id).isValidated()) { //if the person that walks out is invalidated
-					invalidated = false;
-				}
 				people.remove(id);
 			}
 
@@ -146,27 +145,19 @@ public class KinectRenderDemo extends PApplet {
 			for(Entry<Long, Body> entry : idBodyMap.entrySet()) {
 				Body body = entry.getValue();
 				Person person = people.get(entry.getKey()); 
-				//if (!invalidated) {
-					//person.setValidate(false);//set random person as validated
-					//invalidated = true;
-				//}
 				PVector head = null;
-				PVector t1 = null;
 
 				if(body != null) {
 					head = body.getJoint(Body.HEAD);
 					if(head != null) {
-						t1 = calibrator.transformPoint(head);
-						person.setLocation(t1);
+						if (person != null) 
+							person.setLocation(head);
 						
 					}
 				}
 				if (person!= null) {
 					person.draw(this);
 				}
-			}
-			if (!gameStarted) {
-				checkGameStart();
 			}
 
 			
@@ -184,19 +175,6 @@ public class KinectRenderDemo extends PApplet {
 			//startingPoint1 = lava.getRandomPos();
 			//startingPoint2 = lava.getRandomPos();
 	}	
-	
-	/**
-	 * Method to check if players are in position and start the game
-	 */
-	private void checkGameStart() {
-		//check if players are on the instructed position
-		//if(person[1].checkLocation(startingPoint1) && person[2].checkLocation(startingPoint2) ||
-		//person[1].checkLocation(startingPoint2) && person[2].checkLocation(startingPoint1))
-		//if they are
-			//invalidate one person, the other is validated
-				//person[1].setValidate(false);
-				//gameStarted = true;
-	}
 	
 	private void setUpLava() {
 		float minW = -2f;
@@ -225,7 +203,7 @@ public class KinectRenderDemo extends PApplet {
 	public void drawIfValid(PVector vec) {
 		if(vec != null) {
 			fill(0,0,0);
-			ellipse(vec.x, vec.z, .1f,.1f);
+			ellipse(vec.x, vec.z, .01f,.01f);
 		}
 
 	}

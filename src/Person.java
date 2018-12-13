@@ -26,16 +26,9 @@ public class Person {
 		else {
 			app.fill(255,0,0);
 		}
-		app.ellipse(loc.x, loc.z, 0.08f, 0.08f);
+		if (loc != null)
+			app.ellipse(loc.x, loc.y, 0.08f, 0.08f);
 		//System.out.println("Loc z: " + loc.z);
-	}
-	
-	public boolean isValidated() {
-		return validated;
-	}
-	
-	public void setValidate(boolean b) {
-		validated = b;
 	}
 	
 	/**
@@ -43,7 +36,7 @@ public class Person {
 	 * @param v
 	 */
 	public boolean checkLocation(PVector v) {
-		if (v != null && Math.abs(v.x - loc.x) < THRESHOLD && Math.abs(v.y - loc.z) < THRESHOLD) {
+		if (v != null && Math.abs(v.x - loc.x) < THRESHOLD && Math.abs(v.y - loc.y) < THRESHOLD) {
 			return true;
 		}
 		return false;
