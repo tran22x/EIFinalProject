@@ -1,13 +1,16 @@
-
+import java.awt.Color;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map.Entry;
+import java.util.Random;
 
 import edu.mtholyoke.cs.comsc243.kinect.Body;
 import edu.mtholyoke.cs.comsc243.kinect.KinectBodyData;
 import edu.mtholyoke.cs.comsc243.kinectTCP.TCPBodyReceiver;
 import edu.mtholyoke.cs.comsc243em.emendelo.calibration.Calibrator;
+import megamu.mesh.MPolygon;
+import megamu.mesh.Voronoi;
 import processing.core.PApplet;
 import processing.core.PVector;
 import edu.mtholyoke.cs.comsc243.kinect.PersonTracker;
@@ -28,6 +31,12 @@ public class KinectRenderDemo extends PApplet {
 	private PVector startingPoint1 = null; //startingPoint for first person
 	private PVector startingPoint2 = null;	//startingPoint for second person
 	private HashMap<Long, Person> people = new HashMap<Long, Person>();
+	private Random random = new Random();
+	private final int NUMLAVA = 100;
+	private float[][] voronoiPoints = new float[NUMLAVA][2];
+	private Voronoi voronoi;
+	private MPolygon[] voronoiRegions;
+	private float[][] voronoiEdges;
 	//private LinkedList<PVector> lastPos;
 	
 
@@ -59,11 +68,10 @@ public class KinectRenderDemo extends PApplet {
 	}
 
 	public void settings() {
-		createWindow(true, false, .8f);
+		createWindow(true, true, .5f);
 	}
 
 	public void setup(){
-
 		/*
 		 * use this code to run your PApplet from data recorded by recorder 
 		 */
@@ -93,11 +101,27 @@ public class KinectRenderDemo extends PApplet {
 
 	}
 	public void draw(){
-		setScale(.4f);
-		
-		noStroke();
-		
+		setScale(.5f);
 		background(200,200,200);
+		
+		fill(255,100,0);
+		for(int i = 0; i < voronoiRegions.length; i++){
+			voronoiRegions[i].draw(this); // draw this shape
+		}
+		
+		fill(1,1,1);
+		strokeWeight(.02f);
+		for(int i = 0; i < voronoiEdges.length; i++){
+			float startX = voronoiEdges[i][0];
+			float startY = voronoiEdges[i][1];
+			float endX = voronoiEdges[i][2];
+			float endY = voronoiEdges[i][3];
+			line( startX, startY, endX, endY);
+		}
+		
+		for (int i = 0; i<NUMLAVA; i++) {
+			ellipse(voronoiPoints[i][0], voronoiPoints[i][1], .01f, .01f);
+		}
 		KinectBodyData bodyData = kinectReader.getNextData();
 		if(bodyData == null) return;
 		
@@ -153,6 +177,7 @@ public class KinectRenderDemo extends PApplet {
 	/**Method to set up the beginning: Two people are instructed to stand at specific points on the screen. Don't let more than 2 person start */
 	private void gameSetup() {
 		//call method to setup lava
+		setUpLava();
 		
 		//method to setup specific locations for people to stand, make sure that they are different and not too close
 		
@@ -173,9 +198,22 @@ public class KinectRenderDemo extends PApplet {
 				//gameStarted = true;
 	}
 	
-	/**
-	 * 
-	 */
+	private void setUpLava() {
+		float minW = -2f;
+		float maxW = 2f;
+		float minH = -1.5f;
+		float maxH = 1.5f;
+		float randomPos;
+		for (int i=0; i < NUMLAVA; i++) {
+			randomPos = minW + random.nextFloat() * (maxW - minW);
+			voronoiPoints[i][0] = randomPos;
+			randomPos = minH + random.nextFloat() * (maxH - minH);
+			voronoiPoints[i][1] = randomPos;
+		}
+		voronoi = new Voronoi(voronoiPoints);
+		voronoiRegions = voronoi.getRegions();
+		voronoiEdges = voronoi.getEdges();
+	}
 	
 
 	/**

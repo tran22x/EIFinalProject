@@ -1,6 +1,6 @@
 import processing.core.PVector;
 
-public class floor_is_lava {
+public class FloorIsJava {
 	//location of two person
 	PVector person1;
 	PVector person2;
