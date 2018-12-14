@@ -1,9 +1,30 @@
+import java.util.ArrayList;
+
+import edu.mtholyoke.cs.comsc243.kinect.Body;
 import processing.core.PApplet;
 import processing.core.PVector;
 
 public class Person {
 	Long id;
-	PVector loc;
+	PVector head;
+	//all body joints
+	PVector spine;
+	PVector shoulderLeft;
+	PVector shoulderRight;
+	PVector handRight;
+	PVector handLeft;
+	PVector elbowRight;
+	PVector elbowLeft;
+	PVector hipRight;
+	PVector hipLeft;
+	PVector kneeRight;
+	PVector kneeLeft;
+	PVector footRight;
+	PVector footLeft;
+	PApplet app;
+	Body body;
+	PVector[] allJoints = {head, spine, shoulderLeft, shoulderRight, handRight, handLeft, elbowRight, elbowLeft, hipRight, hipLeft, kneeRight, kneeLeft, footRight, footLeft};
+	
 	int color;
 	float radius;
 	boolean validated = true;
@@ -11,36 +32,210 @@ public class Person {
 	
 	public Person(Long id, PApplet app) {
 		this.id = id;
+		this.app = app;
 		color = app.color(app.random(0, 255), 255, 255);
 		radius = app.random(.1f, .3f);
 	}
 	
-	public void setLocation(PVector loc) {
-		this.loc = loc;
+	public PVector[] getAllJoints() {
+		return allJoints;
 	}
 	
+	
+	
+	public void setLocation(PVector loc) {
+		//this.loc = loc;
+	}
+	
+	private void drawIfValid(PVector v) {
+		if (v != null){
+			app.fill(255, 0, 0);
+			app.noStroke();
+			app.ellipse(v.x, v.y, 0.1f, 0.1f);
+		}	
+	}
 	public void draw(PApplet app) {
-		if (validated) { //different colours for validated and non validated ppl
-			app.fill(color);
-		}
-		else {
 			app.fill(255,0,0);
-		}
-		if (loc != null)
-			app.ellipse(loc.x, loc.y, 0.08f, 0.08f);
-		//System.out.println("Loc z: " + loc.z);
+			drawIfValid(head);
+//			drawIfValid(spine);
+//			drawIfValid(shoulderLeft);
+//			drawIfValid(shoulderRight);
+			drawIfValid(handLeft);
+			drawIfValid(handRight);
+	}
+	
+	public void setBody (Body b) {
+		if (b != null) {
+			this.body = b;
+			setAllJoints();
+		}		
 	}
 	
 	/**
-	 * Method to check if the person is standing at a specific location
-	 * @param v
+	 * Methods to set coordinates of all joints
 	 */
-	public boolean checkLocation(PVector v) {
-		if (v != null && Math.abs(v.x - loc.x) < THRESHOLD && Math.abs(v.y - loc.y) < THRESHOLD) {
-			return true;
+	private void setAllJoints() {
+		if (body != null) {
+			setHead(body.getJoint(Body.HEAD));
+			setSpine(body.getJoint(Body.SPINE_BASE));
+			setShoulderLeft(body.getJoint(Body.SHOULDER_LEFT));
+			setShoulderRight(body.getJoint(Body.SHOULDER_RIGHT));
+			setHandLeft(body.getJoint(Body.HAND_LEFT));
+			setHandRight(body.getJoint(Body.HAND_RIGHT));
+			setElbowLeft(body.getJoint(Body.ELBOW_LEFT));
+			setElbowRight(body.getJoint(Body.ELBOW_RIGHT));
+			setHipRight(body.getJoint(Body.HIP_RIGHT));
+			setHipLeft(body.getJoint(Body.HIP_LEFT));
+			setKneeLeft(body.getJoint(Body.KNEE_LEFT));
+			setKneeRight(body.getJoint(Body.KNEE_RIGHT));
+			setFootRight(body.getJoint(Body.FOOT_RIGHT));
+			setFootLeft(body.getJoint(Body.FOOT_LEFT));	
 		}
-		return false;
 	}
+	
+	
+	/** Getters and setters for each joint **/
+	
+	public PVector getHead() {
+		return head;
+	}
+
+	public void setHead(PVector head) {
+		if (head != null) {
+			this.head = head;
+		}
+	}
+
+	public PVector getSpine() {
+		return spine;
+	}
+
+	public void setSpine(PVector spine) {
+		if (spine != null)
+			this.spine = spine;
+	}
+
+	public PVector getShoulderLeft() {
+		return shoulderLeft;
+	}
+
+	public void setShoulderLeft(PVector shoulderLeft) {
+		if (shoulderLeft != null)
+			this.shoulderLeft = shoulderLeft;
+	}
+
+	public PVector getShoulderRight() {
+		return shoulderRight;
+	}
+
+	public void setShoulderRight(PVector shoulderRight) {
+		if (shoulderRight != null)
+			this.shoulderRight = shoulderRight;
+	}
+
+	public PVector getHandRight() {
+			return handRight;
+	}
+
+	public void setHandRight(PVector handRight) {
+		if (handRight != null)
+			this.handRight = handRight;
+	}
+
+	public PVector getHandLeft() {
+		return handLeft;
+	}
+
+	public void setHandLeft(PVector handLeft) {
+		if (handLeft != null)
+			this.handLeft = handLeft;
+	}
+
+	public PVector getElbowRight() {
+		return elbowRight;
+	}
+
+	public void setElbowRight(PVector elbowRight) {
+		if (elbowRight != null) 
+			this.elbowRight = elbowRight;
+	}
+
+	public PVector getElbowLeft() {
+		return elbowLeft;
+	}
+
+	public void setElbowLeft(PVector elbowLeft) {
+		if (elbowLeft != null)
+			this.elbowLeft = elbowLeft;
+	}
+
+	public PVector getHipRight() {
+		return hipRight;
+	}
+
+	public void setHipRight(PVector hipRight) {
+		if (hipRight != null)
+			this.hipRight = hipRight;
+	}
+
+	public PVector getHipLeft() {
+		return hipLeft;
+	}
+
+	public void setHipLeft(PVector hipLeft) {
+		if (hipLeft != null)
+			this.hipLeft = hipLeft;
+	}
+
+	public PVector getKneeRight() {
+		return kneeRight;
+	}
+
+	public void setKneeRight(PVector kneeRight) {
+		if (kneeRight != null)
+			this.kneeRight = kneeRight;
+	}
+
+	public PVector getKneeLeft() {
+		return kneeLeft;
+	}
+
+	public void setKneeLeft(PVector kneeLeft) {
+		if (kneeLeft != null)
+			this.kneeLeft = kneeLeft;
+	}
+
+	public PVector getFootRight() {
+		return footRight;
+	}
+
+	public void setFootRight(PVector footRight) {
+		if (footRight != null)
+			this.footRight = footRight;
+	}
+
+	public PVector getFootLeft() {
+		return footLeft;
+	}
+
+	public void setFootLeft(PVector footLeft) {
+		if (footLeft != null)
+			this.footLeft = footLeft;
+	}
+
+	public Body getBody() {
+		return body;
+	}
+//	/**
+//	 * Method to check if the person is standing at a specific location
+//	 * @param v
+//	 */
+//	public boolean checkLocation(PVector v) {
+//		if (v != null && Math.abs(v.x - loc.x) < THRESHOLD && Math.abs(v.y - loc.y) < THRESHOLD) {
+//			return true;
+//		}
+//		return false;
+//	}
 	
 
 }
