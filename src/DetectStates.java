@@ -10,8 +10,10 @@ public class DetectStates {
 	PVector handL2;
 	PVector handR2;
 
-	
-	int color = 0;
+	//control colors
+	int R;
+	int G;
+	int B;
 	
 	
 	
@@ -44,9 +46,7 @@ public class DetectStates {
 	}
 	public void holdOneHands(KinectRenderDemo demo) {
 		//TODO: draw based on what hold hands suppose to do 
-		//change background? 
-		color = 0;
-		demo.background(color);
+
 	}
 	public void holdBothHands(KinectRenderDemo demo) {
 		//TODO: draw based on what hold hands suppose to do 
@@ -60,6 +60,11 @@ public class DetectStates {
 	}
 	public void timeElappsed(KinectRenderDemo demo) {
 		//TODO: do something that changes by time
+		R = 255;
+		G = (G+5)%100;
+		B = (B+5)%150;
+		demo.background(R,G,B);
+		
 		
 	}
 	
