@@ -11,7 +11,7 @@ public class DetectStates {
 	PVector handR2;
 
 	
-	int color;
+	int color = 0;
 	
 	
 	
