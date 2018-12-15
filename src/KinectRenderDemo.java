@@ -30,13 +30,10 @@ public class KinectRenderDemo extends PApplet {
 	//KinectMsgHandler kinectReader;
 	private PersonTracker tracker;
 	private HashMap<Long, Person> people = new HashMap<Long, Person>();
-	private Random random = new Random();
-	private final int NUMLAVA = 100;
-	private float[][] voronoiPoints = new float[NUMLAVA][2];
-	private Voronoi voronoi;
-	private MPolygon[] voronoiRegions;
-	private float[][] voronoiEdges;
 	//private LinkedList<PVector> lastPos;
+	private Pattern pattern;
+	private Person person1;
+	private Person person2;
 	
 
 	TCPBodyReceiver kinectReader;
@@ -94,7 +91,7 @@ public class KinectRenderDemo extends PApplet {
 
 		 
 		tracker = new PersonTracker();	
-		
+		pattern = new Pattern();
 		kinectReader = new TCPBodyReceiver("138.110.92.93", 8008);
 		try {
 			kinectReader.start();
@@ -108,30 +105,11 @@ public class KinectRenderDemo extends PApplet {
 	public void draw(){
 		setScale(.5f);
 		background(200,200,200);
-		
-		fill(255,100,0);
-		for(int i = 0; i < voronoiRegions.length; i++){
-			voronoiRegions[i].draw(this); // draw this shape
-		}
-		
-		fill(1,1,1);
-		stroke(0);
-		strokeWeight(.02f);
-		for(int i = 0; i < voronoiEdges.length; i++){
-			float startX = voronoiEdges[i][0];
-			float startY = voronoiEdges[i][1];
-			float endX = voronoiEdges[i][2];
-			float endY = voronoiEdges[i][3];
-			line( startX, startY, endX, endY);
-		}
-		
-		for (int i = 0; i<NUMLAVA; i++) {
-			ellipse(voronoiPoints[i][0], voronoiPoints[i][1], .01f, .01f);
-		}
 		KinectBodyData bodyData = kinectReader.getNextData();
 		if(bodyData == null) return;
 		
 		// as of now this is just drawing the people on the screen
+		// TODO: find and assign person1 and person2
 		if(bodyData != null) {
 			tracker.update(bodyData);
 			for(Long id : tracker.getEnters()) {
@@ -164,37 +142,28 @@ public class KinectRenderDemo extends PApplet {
 //				}
 			}
 
+			if (person1 != null && person2 != null){
+				pattern.drawTwoPeople(this, person1, person2);
+			} else if (person1 == null && person2 != null){
+				pattern.drawOnePerson(this, person2);
+			} else if (person2 == null && person1 !=null){
+				pattern.drawOnePerson(this, person1);
+			} else {
+				pattern.drawNoBody(this);
+			}
+
 		}
 	}
 	
 	/**Method to set up the beginning: Two people are instructed to stand at specific points on the screen. Don't let more than 2 person start */
 	private void gameSetup() {
 		//call method to setup lava
-		setUpLava();
 		
 		//method to setup specific locations for people to stand, make sure that they are different and not too close
 		
 			//startingPoint1 = lava.getRandomPos();
 			//startingPoint2 = lava.getRandomPos();
 	}	
-	
-	private void setUpLava() {
-		float minW = -2f;
-		float maxW = 2f;
-		float minH = -1.5f;
-		float maxH = 1.5f;
-		float randomPos;
-		for (int i=0; i < NUMLAVA; i++) {
-			randomPos = minW + random.nextFloat() * (maxW - minW);
-			voronoiPoints[i][0] = randomPos;
-			randomPos = minH + random.nextFloat() * (maxH - minH);
-			voronoiPoints[i][1] = randomPos;
-		}
-		voronoi = new Voronoi(voronoiPoints);
-		voronoiRegions = voronoi.getRegions();
-		voronoiEdges = voronoi.getEdges();
-	}
-	
 
 	/**
 	 * Draws an ellipse in the x,y position of the vector (it ignores z).
