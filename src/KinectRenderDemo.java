@@ -115,6 +115,7 @@ public class KinectRenderDemo extends PApplet {
 		}
 		
 		fill(1,1,1);
+		stroke(0);
 		strokeWeight(.02f);
 		for(int i = 0; i < voronoiEdges.length; i++){
 			float startX = voronoiEdges[i][0];
@@ -134,6 +135,7 @@ public class KinectRenderDemo extends PApplet {
 		if(bodyData != null) {
 			tracker.update(bodyData);
 			for(Long id : tracker.getEnters()) {
+					System.out.println("Person detected");
 					people.put(id, new Person(id, this));
 			}
 			for(Long id: tracker.getExits()) {
@@ -145,23 +147,23 @@ public class KinectRenderDemo extends PApplet {
 			for(Entry<Long, Body> entry : idBodyMap.entrySet()) {
 				Body body = entry.getValue();
 				Person person = people.get(entry.getKey()); 
-				PVector head = null;
-
-				if(body != null) {
-					head = body.getJoint(Body.HEAD);
-					if(head != null) {
-						if (person != null) 
-							person.setLocation(head);
-						
-					}
-				}
-				if (person!= null) {
+				if (body != null && person != null) {
+					//System.out.println("Inside loops");
+					person.setBody(body); //set body and populate all joints
 					person.draw(this);
 				}
+				//PVector head = null;
+
+//				if(body != null) {
+//					head = body.getJoint(Body.HEAD);
+//					if(head != null) {
+//						if (person != null) 
+//							person.setLocation(head);
+//						
+//					}
+//				}
 			}
 
-			
-		//game logic goes here
 		}
 	}
 	
