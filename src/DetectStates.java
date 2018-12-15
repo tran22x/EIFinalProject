@@ -11,9 +11,9 @@ public class DetectStates {
 	PVector handR2;
 
 	//control colors
-	int R;
-	int G;
-	int B;
+	int R = 255;
+	int G = 50;
+	int B = 0;
 	
 	
 	
@@ -59,12 +59,10 @@ public class DetectStates {
 		
 	}
 	public void timeElappsed(KinectRenderDemo demo) {
-		//TODO: do something that changes by time
-		R = 255;
+		//TODO: changes the color of background by time in the red-ish range
 		G = (G+5)%100;
 		B = (B+5)%150;
 		demo.background(R,G,B);
-		
 		
 	}
 	
