@@ -1,4 +1,4 @@
-package megamu.mesh;
+package voronoi;
 
 import processing.core.*;
 
@@ -6,7 +6,6 @@ public class MPolygon {
 
 	float[][] coords;
 	int count;
-	PImage backgroundImg;
 	
 	public MPolygon(){
 		this(0);
@@ -15,7 +14,6 @@ public class MPolygon {
 	public MPolygon(int points){
 		coords = new float[points][2];
 		count = 0;
-		backgroundImg = loadImage("data/java_img.jpg");
 	}
 
 	public void add(float x, float y){
@@ -31,7 +29,6 @@ public class MPolygon {
 	public void draw(PGraphics g){
 		g.beginShape();
 		for(int i=0; i<count; i++){
-			g.background(backgroundImg);
 			g.vertex(coords[i][0], coords[i][1]);
 		}
 		g.endShape(PApplet.CLOSE);
