@@ -4,8 +4,8 @@
 	<classpathentry exported="true" kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8"/>
 	<classpathentry exported="true" kind="con" path="org.eclipse.jdt.USER_LIBRARY/kinect"/>
 	<classpathentry exported="true" kind="con" path="org.eclipse.jdt.USER_LIBRARY/processing"/>
-	<classpathentry kind="lib" path="/Users/olive/Documents/Calibrate.jar"/>
-	<classpathentry kind="lib" path="/Users/olive/Documents/workspace/EIFinalProject/mesh/library/quickhull3d.1.4.jar"/>
-	<classpathentry kind="lib" path="/Users/olive/Documents/workspace/EIFinalProject/mesh/library/mesh.jar"/>
+	<classpathentry kind="lib" path="/Users/nguyenbaotruong/projects/EIFinalProject/mesh/library/mesh.jar"/>
+	<classpathentry kind="lib" path="/Users/nguyenbaotruong/projects/EIFinalProject/mesh/library/quickhull3d.1.4.jar"/>
+	<classpathentry kind="lib" path="/Users/nguyenbaotruong/projects/EIFinalProject/MidPose.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

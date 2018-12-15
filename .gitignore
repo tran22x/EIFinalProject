@@ -1,1 +1,5 @@
 /bin/
+.classpath
+.idea/
+EIFinalProject.iml
+MidPose.jar
