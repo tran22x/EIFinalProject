@@ -9,11 +9,11 @@ public class Pattern {
 	private Person person2;
 	private Voronoi voronoi;
 	private MPolygon[] voronoiRegions;
-	private final int NUMPOINTS = 100;
+	private final int NUMPOINTS = 150;
 	private float[][] voronoiPoints = new float[NUMPOINTS][2];
 	private float[][] voronoiEdges;
 	private Random random = new Random();
-	private final int THREADHOLD = 10;
+	private final double THREADHOLD = 0.2f;
 	public Pattern (Person person1, Person person2) {
 		this.person1 = person1;
 		this.person2 = person2;
@@ -32,10 +32,15 @@ public class Pattern {
 			if (joint != null) {
 				findClosestPoint(joint);
 			}
-		}
+		}	
 		drawVoronoi(app);
 	}
 	
+	public void resetVoronoi(PApplet app) {
+		setUpVoronoi();
+		drawVoronoi(app);
+		
+	}
 	public void drawNoBody(PApplet app) {
 		drawVoronoi(app);
 	}

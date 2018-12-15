@@ -30,7 +30,6 @@ public class KinectRenderDemo extends PApplet {
 	//KinectMsgHandler kinectReader;
 	private PersonTracker tracker;
 	private HashMap<Long, Person> people = new HashMap<Long, Person>();
-	//private LinkedList<PVector> lastPos;
 	private Pattern pattern;
 	private Person person1;
 	private Person person2;
@@ -99,7 +98,6 @@ public class KinectRenderDemo extends PApplet {
 			System.out.println("Unable to connect to kinect server");
 			exit();
 		}
-		gameSetup(); //setup lava and random positions for people to stand and start
 
 	}
 	public void draw(){
@@ -118,68 +116,47 @@ public class KinectRenderDemo extends PApplet {
 			}
 			for(Long id: tracker.getExits()) {
 				people.remove(id);
+				if (people.size() == 0) { //if the last person leaves the 
+					pattern.resetVoronoi(this);
+				}
 			}
 
 			HashMap<Long, Body> idBodyMap = tracker.getPeople();
-
 			for(Entry<Long, Body> entry : idBodyMap.entrySet()) {
-				Body body = entry.getValue();
-				Person person = people.get(entry.getKey()); 
-				if (body != null && person != null) {
-					//System.out.println("Inside loops");
-					person.setBody(body); //set body and populate all joints
-					person.draw(this);
-				}
-				//PVector head = null;
+					Body body = entry.getValue();
+					Person person = people.get(entry.getKey()); 
+					if (body != null && person != null) {
+						person.setBody(body); //set body and populate all joints
+						pattern.drawOnePerson(this, person);
+						person.draw(this);
+					}
+					//PVector head = null;
 
-//				if(body != null) {
-//					head = body.getJoint(Body.HEAD);
-//					if(head != null) {
-//						if (person != null) 
-//							person.setLocation(head);
-//						
+//					if(body != null) {
+//						head = body.getJoint(Body.HEAD);
+//						if(head != null) {
+//							if (person != null) 
+//								person.setLocation(head);
+//							
+//						}
 //					}
-//				}
-			}
-
-			if (person1 != null && person2 != null){
-				pattern.drawTwoPeople(this, person1, person2);
-			} else if (person1 == null && person2 != null){
-				pattern.drawOnePerson(this, person2);
-			} else if (person2 == null && person1 !=null){
-				pattern.drawOnePerson(this, person1);
-			} else {
+				}
+			if (people.size() == 0) {
 				pattern.drawNoBody(this);
 			}
 
+//			if (person1 != null && person2 != null){
+//				pattern.drawTwoPeople(this, person1, person2);
+//			} else if (person1 == null && person2 != null){
+//				pattern.drawOnePerson(this, person2);
+//			} else if (person2 == null && person1 !=null){
+//				pattern.drawOnePerson(this, person1);
+//			} else {
+//				pattern.drawNoBody(this);
+//			}
+
 		}
-	}
-	
-	/**Method to set up the beginning: Two people are instructed to stand at specific points on the screen. Don't let more than 2 person start */
-	private void gameSetup() {
-		//call method to setup lava
-		
-		//method to setup specific locations for people to stand, make sure that they are different and not too close
-		
-			//startingPoint1 = lava.getRandomPos();
-			//startingPoint2 = lava.getRandomPos();
 	}	
-
-	/**
-	 * Draws an ellipse in the x,y position of the vector (it ignores z).
-	 * Will do nothing is vec is null.  This is handy because get joint 
-	 * will return null if the joint isn't tracked. 
-	 * @param vec
-	 */
-	public void drawIfValid(PVector vec) {
-		if(vec != null) {
-			fill(0,0,0);
-			ellipse(vec.x, vec.z, .01f,.01f);
-		}
-
-	}
-
-
 	public static void main(String[] args) {
 		PApplet.main(KinectRenderDemo.class.getName());
 	}

@@ -38,6 +38,7 @@ public class Person {
 	}
 	
 	public PVector[] getAllJoints() {
+		System.out.println("Head is: " + allJoints[0]);
 		return allJoints;
 	}
 	
@@ -102,6 +103,7 @@ public class Person {
 
 	public void setHead(PVector head) {
 		if (head != null) {
+			allJoints[0] = head;
 			this.head = head;
 		}
 	}
@@ -112,6 +114,7 @@ public class Person {
 
 	public void setSpine(PVector spine) {
 		if (spine != null)
+			allJoints[1] = spine;
 			this.spine = spine;
 	}
 
@@ -121,6 +124,7 @@ public class Person {
 
 	public void setShoulderLeft(PVector shoulderLeft) {
 		if (shoulderLeft != null)
+			allJoints[2] = shoulderLeft;
 			this.shoulderLeft = shoulderLeft;
 	}
 
@@ -130,6 +134,7 @@ public class Person {
 
 	public void setShoulderRight(PVector shoulderRight) {
 		if (shoulderRight != null)
+			allJoints[3] = shoulderRight;
 			this.shoulderRight = shoulderRight;
 	}
 
@@ -139,6 +144,7 @@ public class Person {
 
 	public void setHandRight(PVector handRight) {
 		if (handRight != null)
+			allJoints[4] = handRight;
 			this.handRight = handRight;
 	}
 
@@ -148,6 +154,7 @@ public class Person {
 
 	public void setHandLeft(PVector handLeft) {
 		if (handLeft != null)
+			allJoints[5] = handLeft;
 			this.handLeft = handLeft;
 	}
 
@@ -157,6 +164,7 @@ public class Person {
 
 	public void setElbowRight(PVector elbowRight) {
 		if (elbowRight != null) 
+			allJoints[6] = elbowRight;
 			this.elbowRight = elbowRight;
 	}
 
@@ -165,8 +173,11 @@ public class Person {
 	}
 
 	public void setElbowLeft(PVector elbowLeft) {
-		if (elbowLeft != null)
+		if (elbowLeft != null){
+			allJoints[7] = elbowRight;
 			this.elbowLeft = elbowLeft;
+		}
+			
 	}
 
 	public PVector getHipRight() {
@@ -174,8 +185,11 @@ public class Person {
 	}
 
 	public void setHipRight(PVector hipRight) {
-		if (hipRight != null)
+		if (hipRight != null) {
+			allJoints[8] = hipRight;
 			this.hipRight = hipRight;
+		}
+			
 	}
 
 	public PVector getHipLeft() {
@@ -183,8 +197,11 @@ public class Person {
 	}
 
 	public void setHipLeft(PVector hipLeft) {
-		if (hipLeft != null)
+		if (hipLeft != null) {
 			this.hipLeft = hipLeft;
+			allJoints[9] = hipLeft;
+		}
+			
 	}
 
 	public PVector getKneeRight() {
@@ -192,8 +209,11 @@ public class Person {
 	}
 
 	public void setKneeRight(PVector kneeRight) {
-		if (kneeRight != null)
+		if (kneeRight != null) {
+			allJoints[10] = kneeRight;
 			this.kneeRight = kneeRight;
+		}
+			
 	}
 
 	public PVector getKneeLeft() {
@@ -201,8 +221,10 @@ public class Person {
 	}
 
 	public void setKneeLeft(PVector kneeLeft) {
-		if (kneeLeft != null)
+		if (kneeLeft != null) {
 			this.kneeLeft = kneeLeft;
+			allJoints[11] = kneeLeft;
+		}
 	}
 
 	public PVector getFootRight() {
@@ -210,8 +232,10 @@ public class Person {
 	}
 
 	public void setFootRight(PVector footRight) {
-		if (footRight != null)
+		if (footRight != null) {
+			allJoints[12] = footRight;
 			this.footRight = footRight;
+		}
 	}
 
 	public PVector getFootLeft() {
@@ -220,6 +244,7 @@ public class Person {
 
 	public void setFootLeft(PVector footLeft) {
 		if (footLeft != null)
+			allJoints[13] = footLeft;
 			this.footLeft = footLeft;
 	}
 
