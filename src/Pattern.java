@@ -1,3 +1,5 @@
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Random;
 import processing.core.PApplet;
 import processing.core.PVector;
@@ -9,11 +11,13 @@ public class Pattern {
 	private Person person2;
 	private Voronoi voronoi;
 	private MPolygon[] voronoiRegions;
-	private final int NUMPOINTS = 100;
+	private final int NUMPOINTS = 150;
 	private float[][] voronoiPoints = new float[NUMPOINTS][2];
 	private float[][] voronoiEdges;
 	private Random random = new Random();
-	private final int THREADHOLD = 10;
+	private Map<PVector, Integer> m = new HashMap<>();
+	
+	private final double THREADHOLD = 0.05f;
 	public Pattern (Person person1, Person person2) {
 		this.person1 = person1;
 		this.person2 = person2;
@@ -28,14 +32,21 @@ public class Pattern {
 	}
 	
 	public void drawOnePerson(PApplet app, Person person) {
-		for (PVector joint : person.getAllJoints()) {
-			if (joint != null) {
-				findClosestPoint(joint);
-			}
+		if (person != null) {
+			for (PVector joint : person.getAllJoints()) {
+				if (joint != null) {
+						findClosestPoint(joint);
+				}
+			}	
+			drawVoronoi(app);
 		}
-		drawVoronoi(app);
 	}
 	
+	public void resetVoronoi(PApplet app) {
+		setUpVoronoi();
+		drawVoronoi(app);
+		
+	}
 	public void drawNoBody(PApplet app) {
 		drawVoronoi(app);
 	}
@@ -84,12 +95,12 @@ public class Pattern {
 		for (MPolygon piece : voronoiRegions) {
 			for (float[] point : piece.getCoords()) {
 				if (computeDistance(point[0], point[1], vector.x, vector.y) < THREADHOLD) {
-					point[0] = vector.x;
-					point[1] = vector.y;
+						point[0] = vector.x;
+						point[1] = vector.y;
+					}
 				}
 			}
 		}
-	}
 	
 	public float computeDistance (float firstX, float firstY, float secondX, float secondY) {
 		return ((firstX - secondX)*(firstX-secondX) + (firstY - secondY)*(firstY - secondY));

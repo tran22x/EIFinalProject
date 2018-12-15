@@ -23,6 +23,8 @@ public class DetectStates {
 		}
 			return false;
 	}
+	
+	//public boolean holdOneHand (Person person1, p)
 	public void changeState(KinectRenderDemo demo, Person person1, Person person2) {
 		//TODO: controls states
 		handL1 = person1.getHandLeft();
@@ -31,7 +33,7 @@ public class DetectStates {
 		handR2 = person2.getHandRight();
 		
 		// if person holds one hands
-		if (touches(handL1,handL2) ^ touches(handR1,handR2)) {
+		if (touches(handL1,handL2) & touches(handR1,handR2)) {
 			holdOneHands(demo);
 		}
 		else if (touches(handL1,handL2) & touches(handR1,handR2)) {

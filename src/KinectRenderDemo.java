@@ -27,16 +27,15 @@ public class KinectRenderDemo extends PApplet {
 	public static int PROJECTOR_WIDTH = 1024;
 	public static int PROJECTOR_HEIGHT = 786;
 	
-	//KinectMsgHandler kinectReader;
+	KinectMsgHandler kinectReader;
 	private PersonTracker tracker;
 	private HashMap<Long, Person> people = new HashMap<Long, Person>();
-	//private LinkedList<PVector> lastPos;
 	private Pattern pattern;
 	private Person person1;
 	private Person person2;
 	
 
-	TCPBodyReceiver kinectReader;
+	//TCPBodyReceiver kinectReader;
 	public static float PROJECTOR_RATIO = (float)PROJECTOR_HEIGHT/(float)PROJECTOR_WIDTH;
 
 	public void createWindow(boolean useP2D, boolean isFullscreen, float windowsScale) {
@@ -72,34 +71,33 @@ public class KinectRenderDemo extends PApplet {
 		 * use this code to run your PApplet from data recorded by recorder 
 		 */
 		
-//		String filename = "bodyPose.kinect";
-//		int loopCnt = -1; // use negative number to loop forever
-//		try {
-//			System.out.println("Trying to read " + filename + " loops:"  +loopCnt);
-//			kinectReader = new PoseFileReader(filename, loopCnt);
-//		} catch (FileNotFoundException e) {
-//			System.out.println("Unable to open file: " + filename);
-//		}
-//
-//		
-//		try {
-//			kinectReader.start();
-//		} catch (IOException e) {
-//			System.out.println("Unable to start kinect reader");
-//			exit();
-//		}
+		String filename = "bodyPose.kinect";
+		int loopCnt = -1; // use negative number to loop forever
+		try {
+			System.out.println("Trying to read " + filename + " loops:"  +loopCnt);
+			kinectReader = new PoseFileReader(filename, loopCnt);
+		} catch (FileNotFoundException e) {
+			System.out.println("Unable to open file: " + filename);
+		}
+
+		
+		try {
+			kinectReader.start();
+		} catch (IOException e) {
+			System.out.println("Unable to start kinect reader");
+			exit();
+		}
 
 		 
 		tracker = new PersonTracker();	
 		pattern = new Pattern();
-		kinectReader = new TCPBodyReceiver("138.110.92.93", 8008);
-		try {
-			kinectReader.start();
-		} catch (IOException e) {
-			System.out.println("Unable to connect to kinect server");
-			exit();
-		}
-		gameSetup(); //setup lava and random positions for people to stand and start
+//		kinectReader = new TCPBodyReceiver("138.110.92.93", 8008);
+//		try {
+//			kinectReader.start();
+//		} catch (IOException e) {
+//			System.out.println("Unable to connect to kinect server");
+//			exit();
+//		}
 
 	}
 	public void draw(){
@@ -113,73 +111,86 @@ public class KinectRenderDemo extends PApplet {
 		if(bodyData != null) {
 			tracker.update(bodyData);
 			for(Long id : tracker.getEnters()) {
-					System.out.println("Person detected");
-					people.put(id, new Person(id, this));
+					if (people.size() < 2) { //only recognize 2 people
+						people.put(id, new Person(id, this));
+					}	
 			}
 			for(Long id: tracker.getExits()) {
-				people.remove(id);
+				if (people.get(id) != null && people.get(id).equals(person1)) {
+					people.remove(id);
+					person1 = null;
+				}
+				else if (people.get(id) != null && people.get(id).equals(person2)){
+					people.remove(id);
+					person2 = null;
+				}
+				if (people.size() == 0) { //if the last person leaves then reset the voronoi
+					pattern.resetVoronoi(this);
+				}
 			}
 
 			HashMap<Long, Body> idBodyMap = tracker.getPeople();
-
 			for(Entry<Long, Body> entry : idBodyMap.entrySet()) {
-				Body body = entry.getValue();
-				Person person = people.get(entry.getKey()); 
-				if (body != null && person != null) {
-					//System.out.println("Inside loops");
-					person.setBody(body); //set body and populate all joints
-					person.draw(this);
+					Body body = entry.getValue();
+					Person person = people.get(entry.getKey()); 
+					if (body != null && person != null) {
+						if (person1 == null || person1 == null && person2 == null) {
+							person1 = person;
+							System.out.println("person1 added");
+						}
+						} else if (person1 != null && person2 == null) {
+							System.out.println("person2 added");
+							person2 = person;
+						}
+						if (person != null && body != null) {
+							person.setBody(body); //set body and populate all joints
+							pattern.drawOnePerson(this, person);
+							person.draw(this);
+						}
+					}
 				}
-				//PVector head = null;
-
-//				if(body != null) {
-//					head = body.getJoint(Body.HEAD);
-//					if(head != null) {
-//						if (person != null) 
-//							person.setLocation(head);
-//						
-//					}
-//				}
+			
+			if (people.size() == 0) {
+				pattern.drawNoBody(this); 
+			}
+			
+			if (person1 != null && person2 != null && touchingHands(person1, person2)) {
+				System.out.println("Fuck they are holding hands how sweet");
 			}
 
-			if (person1 != null && person2 != null){
-				pattern.drawTwoPeople(this, person1, person2);
-			} else if (person1 == null && person2 != null){
-				pattern.drawOnePerson(this, person2);
-			} else if (person2 == null && person1 !=null){
-				pattern.drawOnePerson(this, person1);
-			} else {
-				pattern.drawNoBody(this);
-			}
+//			if (person1 != null && person2 != null){
+//				pattern.drawTwoPeople(this, person1, person2);
+//			} else if (person1 == null && person2 != null){
+//				pattern.drawOnePerson(this, person2);
+//			} else if (person2 == null && person1 !=null){
+//				pattern.drawOnePerson(this, person1);
+//			} else {
+//				pattern.drawNoBody(this);
+//			}
 
 		}
+	
+	public boolean touchingHands (Person person1, Person person2) {
+		PVector handL1 = person1.getHandLeft();
+		PVector handR1 = person1.getHandRight();
+		PVector handL2 = person2.getHandLeft();
+		PVector handR2 = person2.getHandRight();
+		
+		// if people holds one hands
+		if (touches(handL1,handR2) || touches(handR1,handL2) ||
+			touches(handL1,handL2) & touches(handR1,handR2)) {
+			 return true;
+		}
+		return false;
 	}
 	
-	/**Method to set up the beginning: Two people are instructed to stand at specific points on the screen. Don't let more than 2 person start */
-	private void gameSetup() {
-		//call method to setup lava
-		
-		//method to setup specific locations for people to stand, make sure that they are different and not too close
-		
-			//startingPoint1 = lava.getRandomPos();
-			//startingPoint2 = lava.getRandomPos();
-	}	
-
-	/**
-	 * Draws an ellipse in the x,y position of the vector (it ignores z).
-	 * Will do nothing is vec is null.  This is handy because get joint 
-	 * will return null if the joint isn't tracked. 
-	 * @param vec
-	 */
-	public void drawIfValid(PVector vec) {
-		if(vec != null) {
-			fill(0,0,0);
-			ellipse(vec.x, vec.z, .01f,.01f);
+	public boolean touches(PVector p1, PVector p2) {
+		if (Math.abs(p1.x-p2.x)<0.25f & Math.abs(p2.y-p2.y)<0.25f) {
+			return true;
 		}
-
+			return false;
 	}
-
-
+	
 	public static void main(String[] args) {
 		PApplet.main(KinectRenderDemo.class.getName());
 	}
