@@ -10,7 +10,7 @@ public class DetectStates {
 	PVector handL2;
 	PVector handR2;
 
-	int color;
+	int color = 0;
 	
 	public boolean touches(PVector p1, PVector p2) {
 		if (Math.abs(p1.x-p2.x)<0.25f & Math.abs(p2.y-p2.y)<0.25f) {
