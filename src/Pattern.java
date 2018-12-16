@@ -13,6 +13,9 @@ public class Pattern {
 	private float[][] voronoiPoints = new float[NUMPOINTS][2];
 	private Random random = new Random();
 	public float stroke = .02f;
+	//constrols strokeweights
+	float strokeControl = 1;
+	boolean strokeIncrease = true;
 	
 	private final double THREADHOLD = 0.05f;
 	
@@ -83,8 +86,24 @@ public class Pattern {
 		voronoiRegions = voronoi.getRegions();
 	}
 	
-	public void setStrokeWeight(float strokeWeight) {
-		this.stroke = strokeWeight;
+	public void setStrokeWeight() {
+		//stroke range: 0.05~0.21
+		//strokecontrol range: 1~160 (0.01~1.6)(stroke weight range is 0.05~0.18)
+		if (strokeIncrease==true) {
+			strokeControl =(strokeControl+1);
+		}
+		else {
+			strokeControl =strokeControl-1;
+		}
+		if (strokeControl>=160){
+			strokeIncrease=false;
+		}
+		else if(strokeControl<=1){
+			strokeIncrease=true;
+		}
+		System.out.println(strokeControl);
+		System.out.println(strokeControl*0.001f+0.05f);
+		this.stroke = (strokeControl*0.0001f+0.01f);
 	}
 	
 	public void drawVoronoiRandom(PApplet app) {
