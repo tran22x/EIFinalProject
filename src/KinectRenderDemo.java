@@ -66,29 +66,9 @@ public class KinectRenderDemo extends PApplet {
 	}
 
 	public void setup(){
-		/*
-		 * use this code to run your PApplet from data recorded by recorder 
-		 */
-		
-//		String filename = "bodyPose.kinect";
-//		int loopCnt = -1; // use negative number to loop forever
-//		try {
-//			System.out.println("Trying to read " + filename + " loops:"  +loopCnt);
-//			kinectReader = new PoseFileReader(filename, loopCnt);
-//		} catch (FileNotFoundException e) {
-//			System.out.println("Unable to open file: " + filename);
-//		}
-//
-//		
-//		try {
-//			kinectReader.start();
-//		} catch (IOException e) {
-//			System.out.println("Unable to start kinect reader");
-//			exit();
-//		}
 
 		tracker = new PersonTracker();	
-		pattern = new Pattern(); //set up new voronoi pattern
+		pattern = new Pattern(this); //set up new voronoi pattern
 		kinectReader = new TCPBodyReceiver("138.110.92.93", 8008);
 		try {
 			kinectReader.start();
@@ -138,10 +118,8 @@ public class KinectRenderDemo extends PApplet {
 					if (body != null && person != null) {
 						if (person1 == null && person != person2) {
 							person1 = person;
-							//System.out.println("person1 added");
 						}
 						else if (person2 == null && person != person1) {
-							//System.out.println("person2 added");
 							person2 = person;
 						}
 						person.setBody(body); //set body and populate all joints
@@ -154,25 +132,19 @@ public class KinectRenderDemo extends PApplet {
 					pattern.drawHodingTwoHands(this, person1, person2);
 				}
 				else if (touchingHands(person1, person2)) { //if their hands are touching then change color constantly
-					System.out.println("Fuck they are holding hands how sweet");
-					//TODO: Implement a wait time to prevent epilepsy - as of now the colors is changing too fast
 					pattern.drawVoronoiRandom(this); //changing the color constantly
 				}
 				else { //else the points can stick to them
 					pattern.drawTwoPeople(this, person1, person2);
 				}
-				person1.draw(this);
-				person2.draw(this);
 			}
 			//if one person is available then draw one person
 			else if (person1 == null && person2 != null || person1 != null && person2 == null) {
 				if (person1 != null) {
 					pattern.drawOnePerson(this, person1);
-//					person1.draw(this);
 				}
 				else if (person2 != null) {
 					pattern.drawOnePerson(this, person2);
-//					person2.draw(this);
 				}
 				
 			}
@@ -180,16 +152,6 @@ public class KinectRenderDemo extends PApplet {
 			else if (person1 == null && person2 == null) {
 				pattern.drawNoBody(this);
 			}
-
-//			if (person1 != null && person2 != null){
-//				pattern.drawTwoPeople(this, person1, person2);
-//			} else if (person1 == null && person2 != null){
-//				pattern.drawOnePerson(this, person2);
-//			} else if (person2 == null && person1 !=null){
-//				pattern.drawOnePerson(this, person1);
-//			} else {
-//				pattern.drawNoBody(this);
-//			}
 
 		}
 	
@@ -204,14 +166,47 @@ public class KinectRenderDemo extends PApplet {
 		PVector handR1 = person1.getHandRight();
 		PVector handL2 = person2.getHandLeft();
 		PVector handR2 = person2.getHandRight();
-		
 		// if people holds one hands
-		if (handL1 != null && handR1 != null && handL2 != null && handR2 != null) {
-			if (touches(handL1,handR2) || touches(handR1,handL2) ||
-					touches(handL1,handL2) || touches(handR1,handR2)) {
-					 return true;
-				}
+		if (handL1 != null & handL2 != null && touches(handL1, handL2)) {
+			return true;
 		}
+		else if (handL1 != null & handR2 != null && touches(handL1, handR2)) {
+			return true;
+		}
+		else if (handR1 != null & handL2 != null && touches(handR1, handL2)) {
+			return true;
+		}
+		else if (handR1 != null & handR2 != null && touches(handR1, handR2)) {
+			return true;
+		}
+		return false;
+	}
+	
+	/**
+	 * Method to detect if people's hands are touching
+	 * @param person1
+	 * @param person2
+	 * @return
+	 */
+	public boolean touchingFeet (Person person1, Person person2) {
+		PVector footL1 = person1.getFootLeft();
+		PVector footR1 = person1.getFootRight();
+		PVector footL2 = person2.getFootLeft();
+		PVector footR2 = person2.getFootRight();
+		// if people holds one hands
+		if (footL1 != null & footL2 != null && touches(footL1, footL2)) {
+			return true;
+		}
+		else if (footL1 != null & footR2 != null && touches(footL1, footR2)) {
+			return true;
+		}
+		else if (footR1 != null & footL2 != null && touches(footR1, footL2)) {
+			return true;
+		}
+		else if (footR1 != null & footR2 != null && touches(footR1, footR2)) {
+			return true;
+		}
+		
 		return false;
 	}
 	
@@ -220,8 +215,6 @@ public class KinectRenderDemo extends PApplet {
 		PVector handR1 = person1.getHandRight();
 		PVector handL2 = person2.getHandLeft();
 		PVector handR2 = person2.getHandRight();
-		
-		// if people holds one hands
 		if (handL1 != null && handR1 != null && handL2 != null && handR2 != null) {
 			if (touches(handL1,handR2) && touches(handR1,handL2) ||
 					touches(handL1,handL2) && touches(handR1,handR2)) {
@@ -238,7 +231,7 @@ public class KinectRenderDemo extends PApplet {
 	 * @return
 	 */
 	public boolean touches(PVector p1, PVector p2) {
-		if (Math.abs(p1.x-p2.x)<0.2f & Math.abs(p2.y-p2.y)<0.2f) {
+		if (Math.abs(p1.x-p2.x)<0.1f & Math.abs(p2.y-p2.y)<0.1f) {
 			return true;
 		}
 			return false;
