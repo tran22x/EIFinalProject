@@ -71,33 +71,33 @@ public class KinectRenderDemo extends PApplet {
 		 * use this code to run your PApplet from data recorded by recorder 
 		 */
 		
-		String filename = "bodyPose.kinect";
-		int loopCnt = -1; // use negative number to loop forever
-		try {
-			System.out.println("Trying to read " + filename + " loops:"  +loopCnt);
-			kinectReader = new PoseFileReader(filename, loopCnt);
-		} catch (FileNotFoundException e) {
-			System.out.println("Unable to open file: " + filename);
-		}
-
-		
-		try {
-			kinectReader.start();
-		} catch (IOException e) {
-			System.out.println("Unable to start kinect reader");
-			exit();
-		}
+//		String filename = "bodyPose.kinect";
+//		int loopCnt = -1; // use negative number to loop forever
+//		try {
+//			System.out.println("Trying to read " + filename + " loops:"  +loopCnt);
+//			kinectReader = new PoseFileReader(filename, loopCnt);
+//		} catch (FileNotFoundException e) {
+//			System.out.println("Unable to open file: " + filename);
+//		}
+//
+//		
+//		try {
+//			kinectReader.start();
+//		} catch (IOException e) {
+//			System.out.println("Unable to start kinect reader");
+//			exit();
+//		}
 
 		 
 		tracker = new PersonTracker();	
 		pattern = new Pattern();
-//		kinectReader = new TCPBodyReceiver("138.110.92.93", 8008);
-//		try {
-//			kinectReader.start();
-//		} catch (IOException e) {
-//			System.out.println("Unable to connect to kinect server");
-//			exit();
-//		}
+		kinectReader = new TCPBodyReceiver("138.110.92.93", 8008);
+		try {
+			kinectReader.start();
+		} catch (IOException e) {
+			System.out.println("Unable to connect to kinect server");
+			exit();
+		}
 
 	}
 	public void draw(){
@@ -106,7 +106,6 @@ public class KinectRenderDemo extends PApplet {
 		KinectBodyData bodyData = kinectReader.getNextData();
 		if(bodyData == null) return;
 		
-		// as of now this is just drawing the people on the screen
 		// TODO: find and assign person1 and person2
 		if(bodyData != null) {
 			tracker.update(bodyData);
@@ -134,28 +133,27 @@ public class KinectRenderDemo extends PApplet {
 					Body body = entry.getValue();
 					Person person = people.get(entry.getKey()); 
 					if (body != null && person != null) {
-						if (person1 == null || person1 == null && person2 == null) {
+						if (person1 == null) {
 							person1 = person;
 							System.out.println("person1 added");
 						}
-						} else if (person1 != null && person2 == null) {
+						else if (person2 == null) {
 							System.out.println("person2 added");
 							person2 = person;
 						}
-						if (person != null && body != null) {
-							person.setBody(body); //set body and populate all joints
-							pattern.drawOnePerson(this, person);
-							person.draw(this);
+						person.setBody(body); //set body and populate all joints
+						pattern.drawOnePerson(this, person);
+						person.draw(this);
 						}
 					}
 				}
 			
-			if (people.size() == 0) {
-				pattern.drawNoBody(this); 
-			}
-			
 			if (person1 != null && person2 != null && touchingHands(person1, person2)) {
 				System.out.println("Fuck they are holding hands how sweet");
+				pattern.resetVoronoi(this); //constantly redrawing the background
+			} 
+			else if (people.size() == 0) {
+				pattern.drawNoBody(this); 
 			}
 
 //			if (person1 != null && person2 != null){
@@ -177,9 +175,11 @@ public class KinectRenderDemo extends PApplet {
 		PVector handR2 = person2.getHandRight();
 		
 		// if people holds one hands
-		if (touches(handL1,handR2) || touches(handR1,handL2) ||
-			touches(handL1,handL2) & touches(handR1,handR2)) {
-			 return true;
+		if (handL1 != null && handR1 != null && handL2 != null && handR2 != null) {
+			if (touches(handL1,handR2) || touches(handR1,handL2) ||
+					touches(handL1,handL2) & touches(handR1,handR2)) {
+					 return true;
+				}
 		}
 		return false;
 	}

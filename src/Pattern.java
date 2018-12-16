@@ -15,7 +15,7 @@ public class Pattern {
 	private float[][] voronoiPoints = new float[NUMPOINTS][2];
 	private float[][] voronoiEdges;
 	private Random random = new Random();
-	private Map<PVector, Integer> m = new HashMap<>();
+	private Map<Integer, Integer> m = new HashMap<>();
 	
 	private final double THREADHOLD = 0.05f;
 	public Pattern (Person person1, Person person2) {
@@ -33,12 +33,17 @@ public class Pattern {
 	
 	public void drawOnePerson(PApplet app, Person person) {
 		if (person != null) {
-			for (PVector joint : person.getAllJoints()) {
-				if (joint != null) {
-						findClosestPoint(joint);
-				}
-			}	
+			//for (PVector joint : person.getAllJoints()) {
+			PVector[] j = person.getAllJoints();
+			for (int i = 0; i < j.length; i++) {
+				if (j[i] != null) {
+					//if (!m.containsKey(i) || m.get(i) < 3) { //if there are fewer than 3 points mapped to the same body part
+						findClosestPoint(j[i], i);
+					//}	
+			}
+			//}	
 			drawVoronoi(app);
+			}
 		}
 	}
 	
@@ -91,12 +96,21 @@ public class Pattern {
 //		}
 	}
 	
-	public void findClosestPoint(PVector vector) {
+	public void findClosestPoint(PVector vector, int bodyPartid) {
 		for (MPolygon piece : voronoiRegions) {
 			for (float[] point : piece.getCoords()) {
 				if (computeDistance(point[0], point[1], vector.x, vector.y) < THREADHOLD) {
+//					if (!m.containsKey(bodyPartid)) {
+//						point[0] = vector.x;
+//						point[1] = vector.y;
+//						m.put(bodyPartid, 1); // id is key, num points mapped to that point is value
+//					}
+//					else {
 						point[0] = vector.x;
 						point[1] = vector.y;
+//						int count = m.get(bodyPartid)+1;
+//						m.replace(bodyPartid, count);
+//					}	
 					}
 				}
 			}
