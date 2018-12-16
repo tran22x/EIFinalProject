@@ -27,7 +27,7 @@ public class KinectRenderDemo extends PApplet {
 	public static int PROJECTOR_WIDTH = 1024;
 	public static int PROJECTOR_HEIGHT = 786;
 	
-	KinectMsgHandler kinectReader;
+	//KinectMsgHandler kinectReader;
 	private PersonTracker tracker;
 	private HashMap<Long, Person> people = new HashMap<Long, Person>();
 	private Pattern pattern;
@@ -35,7 +35,7 @@ public class KinectRenderDemo extends PApplet {
 	private Person person2;
 	
 
-	//TCPBodyReceiver kinectReader;
+	TCPBodyReceiver kinectReader;
 	public static float PROJECTOR_RATIO = (float)PROJECTOR_HEIGHT/(float)PROJECTOR_WIDTH;
 
 	public void createWindow(boolean useP2D, boolean isFullscreen, float windowsScale) {
