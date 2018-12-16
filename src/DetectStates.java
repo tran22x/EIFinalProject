@@ -15,6 +15,12 @@ public class DetectStates {
 	int G = 50;
 	int B = 0;
 	
+	//frameTrack
+	int track = 0;
+	
+	//control stroke weight
+	float strokeControl=0;
+	
 	
 	
 	public boolean touches(PVector p1, PVector p2) {
@@ -23,8 +29,7 @@ public class DetectStates {
 		}
 			return false;
 	}
-	
-	//public boolean holdOneHand (Person person1, p)
+
 	public void changeState(KinectRenderDemo demo, Person person1, Person person2) {
 		//TODO: controls states
 		handL1 = person1.getHandLeft();
@@ -36,35 +41,40 @@ public class DetectStates {
 		if (touches(handL1,handL2) & touches(handR1,handR2)) {
 			holdOneHands(demo);
 		}
-		else if (touches(handL1,handL2) & touches(handR1,handR2)) {
-			holdBothHands(demo);
-		}
+//		else if (touches(handL1,handL2) & touches(handR1,handR2)) {
+//			holdBothHands(demo);
+//		}
 		
 		//if time elapse 
-		if (demo.frameCount%100==0) {
+		else if (demo.frameCount%100==0) {
 			timeElappsed(demo);
 		}
 		
 	}
 	public void holdOneHands(KinectRenderDemo demo) {
-		//TODO: draw based on what hold hands suppose to do 
-
-	}
-	public void holdBothHands(KinectRenderDemo demo) {
-		//TODO: draw based on what hold hands suppose to do 
-		//draw a flower? 
-		PVector center = new PVector((handL1.x+handL2.x)/2, (handL1.y+handL2.y)/2);
-		//ellipse
-		//demo.ellipse(center.x+Math.cos(Math.PI/6)*0.15, center.y+Math.sin(Math.PI/6)*0.15f, 0.25f, 0.25f);
-		demo.ellipse(center.x, center.y, 0.15f, 0.15f);
-		
-		
-	}
-	public void timeElappsed(KinectRenderDemo demo) {
-		//TODO: changes the color of background by time in the red-ish range
-		G = (G+5)%100;
-		B = (B+5)%150;
+		//TODO: 
+		//changes the color of background by time in the red-ish range
+		//if statement is here so that the change doesn't happen too fast
+		if(demo.frameCount-track>20) {
+			G = (G+1)%100;
+			B = (B+1)%150;
+			track = demo.frameCount;
+		}
 		demo.background(R,G,B);
+	}
+//	public void holdBothHands(KinectRenderDemo demo) {
+//		//TODO: maybe some diagram???
+//		
+//		
+//	}
+	public void timeElappsed(KinectRenderDemo demo) {
+		//TODO: play with the stroke weight?
+		//stroke range: 0.05~0.21
+		//5-21
+		//16
+		strokeControl =(strokeControl+1)%16;
+		demo.strokeWeight(strokeControl*0.01f+0.05f);
+		
 		
 	}
 	
