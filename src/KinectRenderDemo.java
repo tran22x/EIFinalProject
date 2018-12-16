@@ -1,17 +1,10 @@
-import java.awt.Color;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.Map.Entry;
-import java.util.Random;
 
 import edu.mtholyoke.cs.comsc243.kinect.Body;
 import edu.mtholyoke.cs.comsc243.kinect.KinectBodyData;
-import edu.mtholyoke.cs.comsc243.kinect.KinectBodyDataProvider;
 import edu.mtholyoke.cs.comsc243.kinectTCP.TCPBodyReceiver;
-import megamu.mesh.MPolygon;
-import megamu.mesh.Voronoi;
 import processing.core.PApplet;
 import processing.core.PVector;
 import edu.mtholyoke.cs.comsc243.kinect.PersonTracker;
@@ -31,8 +24,6 @@ public class KinectRenderDemo extends PApplet {
 	private Pattern pattern;
 	private Person person1;
 	private Person person2;
-	private int wait = 1000;
-	private int time = Integer.MAX_VALUE;
 
 	TCPBodyReceiver kinectReader;
 	public static float PROJECTOR_RATIO = (float)PROJECTOR_HEIGHT/(float)PROJECTOR_WIDTH;
@@ -83,6 +74,7 @@ public class KinectRenderDemo extends PApplet {
 		background(200,200,200);
 		pattern.setStrokeWeight();
 		KinectBodyData bodyData = kinectReader.getNextData();
+		
 		if(bodyData == null){
 			pattern.drawNoBody(this);
 			return;
@@ -138,6 +130,7 @@ public class KinectRenderDemo extends PApplet {
 					pattern.drawTwoPeople(this, person1, person2);
 				}
 			}
+			
 			//if one person is available then draw one person
 			else if (person1 == null && person2 != null || person1 != null && person2 == null) {
 				if (person1 != null) {
@@ -210,6 +203,12 @@ public class KinectRenderDemo extends PApplet {
 		return false;
 	}
 	
+	/**
+	 * Checking if both hands are holding
+	 * @param person1
+	 * @param person2
+	 * @return
+	 */
 	public boolean touchingBothHands (Person person1, Person person2) {
 		PVector handL1 = person1.getHandLeft();
 		PVector handR1 = person1.getHandRight();

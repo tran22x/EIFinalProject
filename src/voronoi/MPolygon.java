@@ -1,7 +1,4 @@
 package voronoi;
-
-import java.util.Arrays;
-
 import processing.core.*;
 
 public class MPolygon {

@@ -27,29 +27,27 @@ public class Pattern {
 		setUpVoronoi();
 	}
 	
+	/**
+	 * If there are 2 people, their joints attract voronoi points
+	 * @param app
+	 * @param person1
+	 * @param person2
+	 */
 	public void drawTwoPeople(PApplet app, Person person1, Person person2) {
 		if (person1 != null) {
-			//for (PVector joint : person.getAllJoints()) {
 			PVector[] j = person1.getAllJoints();
-//			int jointDetected = 5;
 			for (int i = 0; i < j.length; i++) { //limits the number of joints that can be attached to - this prevents points being shifted constantly between 2 joints
-//				if (j[i] != null && jointDetected > 0) {
 				if (j[i] != null) {
-						findClosestPoint(j[i]);
-//						jointDetected--; 
+					findClosestPoint(j[i]);
 			}
 		}
 	}
 		if (person2 != null) {
-			//for (PVector joint : person.getAllJoints()) {
 			PVector[] j = person2.getAllJoints();
-//			int jointDetected = 5;
 			for (int i = 0; i < j.length; i++) { //limits the number of joints that can be attached to
-//				if (j[i] != null && jointDetected > 0) {
 				if (j[i] != null) {
 					findClosestPoint(j[i]);
-//					jointDetected--;
-			}
+				}
 			}
 		}
 		drawVoronoi(app);
@@ -78,6 +76,7 @@ public class Pattern {
 			voronoiRegions[i].draw(app); // draw this shape
 		}
 	}
+	
 	public void drawNoBody(PApplet app) {
 		drawVoronoi(app);
 	}
@@ -100,7 +99,6 @@ public class Pattern {
 		for (int i = 0; i < colorStack.length; i++) {
 			colorStack[i] = app.color(255,255,255);
 		}
-		
 	}
 	
 	public void setStrokeWeight() {
@@ -147,12 +145,12 @@ public class Pattern {
 		for (MPolygon piece : voronoiRegions) {
 			for (float[] point : piece.getCoords()) {
 				if (computeDistance(point[0], point[1], vector.x, vector.y) < THREADHOLD) {
-						point[0] = vector.x;
-						point[1] = vector.y;
-					}
+					point[0] = vector.x;
+					point[1] = vector.y;
 				}
 			}
 		}
+	}
 	
 	public void pushClosestPoint (PVector vector) {
 		for (MPolygon piece : voronoiRegions) {
