@@ -9,11 +9,7 @@ import processing.core.PApplet;
 import processing.core.PVector;
 import edu.mtholyoke.cs.comsc243.kinect.PersonTracker;
 
-/**
- * @author eitan
- *
- */
-public class KinectRenderDemo extends PApplet {
+public class Euphoria extends PApplet {
 	
 	public static int PROJECTOR_WIDTH = 1024;
 	public static int PROJECTOR_HEIGHT = 786;
@@ -57,7 +53,6 @@ public class KinectRenderDemo extends PApplet {
 	}
 
 	public void setup(){
-
 		tracker = new PersonTracker();	
 		pattern = new Pattern(this); //set up new voronoi pattern
 		kinectReader = new TCPBodyReceiver("138.110.92.93", 8008);
@@ -91,12 +86,10 @@ public class KinectRenderDemo extends PApplet {
 				if (people.get(id) != null && people.get(id).equals(person1)) { //when person exits remove from hashmap and set person to null
 					people.remove(id);
 					person1 = null;
-					System.out.println("Person 1 removed");
 				}
 				else if (people.get(id) != null && people.get(id).equals(person2)){
 					people.remove(id);
 					person2 = null;
-					System.out.println("Person 2 removed");
 				}
 				if (people.size() == 0) { //if the last person leaves then reset the voronoi
 					pattern.resetVoronoi(this);
@@ -123,8 +116,8 @@ public class KinectRenderDemo extends PApplet {
 				if (touchingBothHands(person1, person2)) {
 					pattern.drawHodingTwoHands(this, person1, person2);
 				}
-				else if (touchingHands(person1, person2)) { //if their hands are touching then change color constantly
-					pattern.drawVoronoiRandom(this); //changing the color constantly
+				else if (touchingHands(person1, person2)) { //if one of their hands are touching then change color constantly
+					pattern.drawVoronoiRandom(this);
 				}
 				else { //else the points can stick to them
 					pattern.drawTwoPeople(this, person1, person2);
@@ -149,7 +142,7 @@ public class KinectRenderDemo extends PApplet {
 		}
 	
 	/**
-	 * Method to detect if people's hands are touching
+	 * Method to detect if people are holding 1 hand
 	 * @param person1
 	 * @param person2
 	 * @return
@@ -159,7 +152,7 @@ public class KinectRenderDemo extends PApplet {
 		PVector handR1 = person1.getHandRight();
 		PVector handL2 = person2.getHandLeft();
 		PVector handR2 = person2.getHandRight();
-		// if people holds one hands
+		// if either hands are available and close to each other then return yes
 		if (handL1 != null & handL2 != null && touches(handL1, handL2)) {
 			return true;
 		}
@@ -174,37 +167,10 @@ public class KinectRenderDemo extends PApplet {
 		}
 		return false;
 	}
+
 	
 	/**
-	 * Method to detect if people's hands are touching
-	 * @param person1
-	 * @param person2
-	 * @return
-	 */
-	public boolean touchingFeet (Person person1, Person person2) {
-		PVector footL1 = person1.getFootLeft();
-		PVector footR1 = person1.getFootRight();
-		PVector footL2 = person2.getFootLeft();
-		PVector footR2 = person2.getFootRight();
-		// if people holds one hands
-		if (footL1 != null & footL2 != null && touches(footL1, footL2)) {
-			return true;
-		}
-		else if (footL1 != null & footR2 != null && touches(footL1, footR2)) {
-			return true;
-		}
-		else if (footR1 != null & footL2 != null && touches(footR1, footL2)) {
-			return true;
-		}
-		else if (footR1 != null & footR2 != null && touches(footR1, footR2)) {
-			return true;
-		}
-		
-		return false;
-	}
-	
-	/**
-	 * Checking if both hands are holding
+	 * Checking if people are holding both hands
 	 * @param person1
 	 * @param person2
 	 * @return
@@ -237,7 +203,7 @@ public class KinectRenderDemo extends PApplet {
 	}
 	
 	public static void main(String[] args) {
-		PApplet.main(KinectRenderDemo.class.getName());
+		PApplet.main(Euphoria.class.getName());
 	}
 
 }

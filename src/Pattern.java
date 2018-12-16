@@ -4,8 +4,13 @@ import processing.core.PVector;
 import voronoi.Voronoi;
 import voronoi.MPolygon;
 
+/**
+ * Class to draw and handle interaction between voronoi background and interactors.
+ * @author nanako, natalie, olive
+ *
+ */
 public class Pattern {
-	private static final float SHIFT_THRESHOLD = 0.005f;
+	private static final float SHIFT_THRESHOLD = 0.005f; //how far away the points are moving
 	private Voronoi voronoi;
 	private int color;
 	private MPolygon[] voronoiRegions;
@@ -13,14 +18,11 @@ public class Pattern {
 	private float[][] voronoiPoints = new float[NUMPOINTS][2];
 	private Random random = new Random();
 	public float stroke = .02f;
-	//constrols strokeweights
 	float strokeControl = 1;
-	boolean strokeIncrease = true;
+	boolean strokeIncrease = true; //keep track of whether the stroke weight is increasing or decreasing
 	private PApplet app;
-	
-	private int[] colorStack;
-	
-	private final double THREADHOLD = 0.05f;
+	private int[] colorStack; //to keep track of the individual colors of the pieces
+	private final double THRESHOLD = 0.05f; //to detect if a point is close to a joint or not
 	
 	public Pattern(PApplet app) {
 		this.app = app;
@@ -36,7 +38,7 @@ public class Pattern {
 	public void drawTwoPeople(PApplet app, Person person1, Person person2) {
 		if (person1 != null) {
 			PVector[] j = person1.getAllJoints();
-			for (int i = 0; i < j.length; i++) { //limits the number of joints that can be attached to - this prevents points being shifted constantly between 2 joints
+			for (int i = 0; i < j.length; i++) { 
 				if (j[i] != null) {
 					findClosestPoint(j[i]);
 			}
@@ -44,7 +46,7 @@ public class Pattern {
 	}
 		if (person2 != null) {
 			PVector[] j = person2.getAllJoints();
-			for (int i = 0; i < j.length; i++) { //limits the number of joints that can be attached to
+			for (int i = 0; i < j.length; i++) {
 				if (j[i] != null) {
 					findClosestPoint(j[i]);
 				}
@@ -53,6 +55,11 @@ public class Pattern {
 		drawVoronoi(app);
 	}
 	
+	/**
+	 * If there's 1 person, the points are shifted away from their joints.
+	 * @param app
+	 * @param person
+	 */
 	public void drawOnePerson(PApplet app, Person person) {
 		if (app.frameCount%10==0) {
 			if (person != null) {
@@ -67,6 +74,10 @@ public class Pattern {
 		drawVoronoi(app);
 	}
 	
+	/**
+	 * Resetting the voronoi to its original position
+	 * @param app
+	 */
 	public void resetVoronoi(PApplet app) {
 		app.fill(255,255,255);
 		app.stroke(0);
@@ -119,11 +130,15 @@ public class Pattern {
 		this.stroke = (strokeControl*0.0001f+0.01f);
 	}
 	
+	/**
+	 * Draw the current voronoi pattern with random colors
+	 * @param app
+	 */
 	public void drawVoronoiRandom(PApplet app) {
 		app.stroke(0);
 		app.strokeWeight(stroke);
 		for(int i = 0; i < voronoiRegions.length; i++){
-			if(app.frameCount%15==0) {
+			if(app.frameCount%15==0) { //slowed down the rate of color change
 			color = app.color(app.random(0, 255), app.random(0,255), app.random(0,255));
 			colorStack[i] = color;
 			}
@@ -141,10 +156,14 @@ public class Pattern {
 		}	
 	}
 	
+	/**
+	 * Finding the point closest to the passed in joint and making that point stick to that joint
+	 * @param vector
+	 */
 	public void findClosestPoint(PVector vector) {
 		for (MPolygon piece : voronoiRegions) {
 			for (float[] point : piece.getCoords()) {
-				if (computeDistance(point[0], point[1], vector.x, vector.y) < THREADHOLD) {
+				if (computeDistance(point[0], point[1], vector.x, vector.y) < THRESHOLD) {
 					point[0] = vector.x;
 					point[1] = vector.y;
 				}
@@ -152,10 +171,14 @@ public class Pattern {
 		}
 	}
 	
+	/**
+	 * Finding the point closest to the passed in joint and making that point move away from that joint
+	 * @param vector
+	 */
 	public void pushClosestPoint (PVector vector) {
 		for (MPolygon piece : voronoiRegions) {
 			for (float[] point : piece.getCoords()) {
-				if (computeDistance(point[0], point[1], vector.x, vector.y) < THREADHOLD) {
+				if (computeDistance(point[0], point[1], vector.x, vector.y) < THRESHOLD) {
 					//push it away
 					if (point[0] - vector.x > 0) {
 						point[0] = point[0] + SHIFT_THRESHOLD;
@@ -167,27 +190,6 @@ public class Pattern {
 					} else if (point[1] - vector.y < 0) {
 						point[1] = point[1] - SHIFT_THRESHOLD;
 					}
-				}
-			}
-		}
-	}
-	
-	public void resetPoint () {
-		for (int i = 0; i < voronoiRegions.length; i++) {
-			for (int j = 0; j<voronoiRegions[i].getCoords().length; j++) {
-				float x = voronoiRegions[i].getCoords()[j][0];
-				float y = voronoiRegions[i].getCoords()[j][1];
-				float initX = voronoiRegions[i].getInitCoords()[j][0];
-				float initY = voronoiRegions[i].getInitCoords()[j][1];
-				if (x - initX > 0) {
-					x = x - SHIFT_THRESHOLD;
-				} else if (x - initX < 0) {
-					x = x + SHIFT_THRESHOLD;
-				}
-				if (y - initY > 0) {
-					y = y - SHIFT_THRESHOLD;
-				} else if (y - initY < 0) {
-					y = y + SHIFT_THRESHOLD;
 				}
 			}
 		}
@@ -206,8 +208,7 @@ public class Pattern {
 	}
 	
 	/**
-	 * Draw the pieces at the people's place
-	 * @param app
+	 * Find all regions that overlaps with people's joints and color them 
 	 * @param person1
 	 * @param person2
 	 */

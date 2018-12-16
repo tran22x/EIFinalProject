@@ -4,10 +4,15 @@ import edu.mtholyoke.cs.comsc243.kinect.Body;
 import processing.core.PApplet;
 import processing.core.PVector;
 
+/**
+ * Class to keep track of a person's joints and id
+ * @author nanako, natalie, olive
+ *
+ */
 public class Person {
 	Long id;
-	PVector head;
 	//all body joints
+	PVector head;
 	PVector spine;
 	PVector shoulderLeft;
 	PVector shoulderRight;
@@ -28,7 +33,6 @@ public class Person {
 	int color;
 	float radius;
 	boolean validated = true;
-	final double THRESHOLD = .2f;//threshold to check if the person is standing at a position
 	
 	public Person(Long id, PApplet app) {
 		this.id = id;
@@ -39,32 +43,6 @@ public class Person {
 	
 	public PVector[] getAllJoints() {
 		return allJoints;
-	}
-	
-	
-	
-	public void setLocation(PVector loc) {
-		//this.loc = loc;
-	}
-	
-	private void drawIfValid(PVector v) {
-		if (v != null){
-			app.fill(255, 0, 0);
-			app.noStroke();
-			app.ellipse(v.x, v.y, 0.1f, 0.1f);
-		}	
-	}
-	
-	public void draw(PApplet app) {
-			app.fill(0,0,0);
-			drawIfValid(head);
-			drawIfValid(spine);
-			drawIfValid(shoulderLeft);
-			drawIfValid(shoulderRight);
-			drawIfValid(handLeft);
-			drawIfValid(handRight);
-			drawIfValid(footLeft);
-			drawIfValid(footRight);
 	}
 	
 	public void setBody (Body b) {
@@ -252,17 +230,6 @@ public class Person {
 
 	public Body getBody() {
 		return body;
-	}
-//	/**
-//	 * Method to check if the person is standing at a specific location
-//	 * @param v
-//	 */
-//	public boolean checkLocation(PVector v) {
-//		if (v != null && Math.abs(v.x - loc.x) < THRESHOLD && Math.abs(v.y - loc.y) < THRESHOLD) {
-//			return true;
-//		}
-//		return false;
-//	}
-	
+	}	
 
 }
