@@ -101,9 +101,7 @@ public class KinectRenderDemo extends PApplet {
 	public void draw(){
 		setScale(.5f);
 		background(200,200,200);
-		//if(frameCount%50==0) {
-			pattern.setStrokeWeight();
-		//}
+		pattern.setStrokeWeight();
 		KinectBodyData bodyData = kinectReader.getNextData();
 		if(bodyData == null){
 			pattern.drawNoBody(this);
