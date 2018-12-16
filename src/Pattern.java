@@ -6,22 +6,14 @@ import voronoi.MPolygon;
 
 public class Pattern {
 	private static final float SHIFT_THRESHOLD = 0.005f;
-	private Person person1;
-	private Person person2;
 	private Voronoi voronoi;
 	private int color;
 	private MPolygon[] voronoiRegions;
-	private final int NUMPOINTS = 200;
+	private final int NUMPOINTS = 1000;
 	private float[][] voronoiPoints = new float[NUMPOINTS][2];
-	private float[][] voronoiEdges;
 	private Random random = new Random();
 	
 	private final double THREADHOLD = 0.05f;
-	
-	public Pattern (Person person1, Person person2) {
-		this.person1 = person1;
-		this.person2 = person2;
-	}
 	
 	public Pattern() {
 		setUpVoronoi();
@@ -88,7 +80,6 @@ public class Pattern {
 		}
 		voronoi = new Voronoi(voronoiPoints);
 		voronoiRegions = voronoi.getRegions();
-		voronoiEdges = voronoi.getEdges();
 	}
 	
 	public void drawVoronoiRandom(PApplet app) {
@@ -98,7 +89,7 @@ public class Pattern {
 			color = app.color(app.random(0, 255), app.random(0,255), app.random(0,255));
 			app.fill(color);
 			voronoiRegions[i].draw(app); // draw this shape
-		}	
+		}
 	}
 	
 	public void drawVoronoi(PApplet app) {
@@ -154,7 +145,67 @@ public class Pattern {
 			}
 		}
 	}
+	
+	/**
+	 * Compute the distance of 2 points
+	 * @param firstX x coordinate of first point
+	 * @param firstY y coordinate of first point
+	 * @param secondX x coordinate of second point
+	 * @param secondY y x coordinate of second point
+	 * @return sum of square distance
+	 */
 	public float computeDistance (float firstX, float firstY, float secondX, float secondY) {
 		return ((firstX - secondX)*(firstX-secondX) + (firstY - secondY)*(firstY - secondY));
+	}
+	
+	/**
+	 * Draw the pieces at the people's place
+	 * @param app
+	 * @param person1
+	 * @param person2
+	 */
+	public void drawHodingTwoHands(PApplet app, Person person1, Person person2) {
+		app.stroke(0);
+		app.strokeWeight(.02f);
+		for(int i = 0; i < voronoiRegions.length; i++){
+			boolean contains = voronoiRegions[i].contains(person1.handLeft, person1.elbowLeft)
+					|| voronoiRegions[i].contains(person1.shoulderLeft, person1.elbowLeft)
+					|| voronoiRegions[i].contains(person1.shoulderLeft, person1.spine)
+					|| voronoiRegions[i].contains(person1.hipLeft, person1.spine)
+					|| voronoiRegions[i].contains(person1.hipLeft, person1.shoulderLeft)
+					|| voronoiRegions[i].contains(person1.hipLeft, person1.kneeLeft)
+					|| voronoiRegions[i].contains(person1.kneeLeft, person1.footLeft)
+					
+					|| voronoiRegions[i].contains(person1.handRight, person1.elbowRight)
+					|| voronoiRegions[i].contains(person1.shoulderRight, person1.elbowRight)
+					|| voronoiRegions[i].contains(person1.shoulderRight, person1.spine)
+					|| voronoiRegions[i].contains(person1.hipRight, person1.spine)
+					|| voronoiRegions[i].contains(person1.hipRight, person1.shoulderRight)
+					|| voronoiRegions[i].contains(person1.hipRight, person1.kneeRight)
+					|| voronoiRegions[i].contains(person1.kneeRight, person1.footRight)
+					
+					|| voronoiRegions[i].contains(person2.handLeft, person2.elbowLeft)
+					|| voronoiRegions[i].contains(person2.shoulderLeft, person2.elbowLeft)
+					|| voronoiRegions[i].contains(person2.shoulderLeft, person2.spine)
+					|| voronoiRegions[i].contains(person2.hipLeft, person2.spine)
+					|| voronoiRegions[i].contains(person2.hipLeft, person2.shoulderLeft)
+					|| voronoiRegions[i].contains(person2.hipLeft, person2.kneeLeft)
+					|| voronoiRegions[i].contains(person2.kneeLeft, person2.footLeft)
+					
+					|| voronoiRegions[i].contains(person2.handRight, person2.elbowRight)
+					|| voronoiRegions[i].contains(person2.shoulderRight, person2.elbowRight)
+					|| voronoiRegions[i].contains(person2.shoulderRight, person2.spine)
+					|| voronoiRegions[i].contains(person2.hipRight, person2.spine)
+					|| voronoiRegions[i].contains(person2.hipRight, person2.shoulderRight)
+					|| voronoiRegions[i].contains(person2.hipRight, person2.kneeRight)
+					|| voronoiRegions[i].contains(person2.kneeRight, person2.footRight);
+			if (contains) {
+				color = app.color(app.random(0, 255), app.random(0,255), app.random(0,255));
+				app.fill(color);
+			} else {
+				app.fill(255,100,0);
+			}
+			voronoiRegions[i].draw(app); // draw this shape
+		}
 	}
 }

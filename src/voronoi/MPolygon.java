@@ -41,5 +41,34 @@ public class MPolygon {
 	public float[][] getCoords(){
 		return coords;
 	}
+	
+	/**
+	 * Checking if the region is between 2 points
+	 * @param begin the begin point
+	 * @param end the end point
+	 * @return true if so
+	 */
+	public boolean contains(PVector begin, PVector end) {
+		if (begin != null && end != null) {
+			return contains(begin.x, begin.y, end.x, end.y);
+		} else {
+			return false;
+		}
+	}
+	
+	private boolean contains (float beginX, float beginY, float endX, float endY) {
+		for (float[] point : coords) {
+			if (beginX < point[0] && point[0] < endX && beginY < point[0] && point[0] < endY) {
+				return true;
+			} else if (beginX > point[0] && point[0] > endX && beginY > point[0] && point[0] > endY) {
+				return true;
+			} else if (beginX < point[0] && point[0] < endX && beginY > point[0] && point[0] > endY) {
+				return true;
+			} else if (beginX > point[0] && point[0] > endX && beginY < point[0] && point[0] < endY) {
+				return true;
+			}
+		}
+		return false;
+	}
 
 }

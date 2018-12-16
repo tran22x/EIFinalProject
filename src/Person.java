@@ -54,8 +54,9 @@ public class Person {
 			app.ellipse(v.x, v.y, 0.1f, 0.1f);
 		}	
 	}
+	
 	public void draw(PApplet app) {
-			app.fill(255,0,0);
+			app.fill(0,0,0);
 			drawIfValid(head);
 			drawIfValid(spine);
 			drawIfValid(shoulderLeft);

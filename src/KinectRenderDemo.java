@@ -27,7 +27,7 @@ public class KinectRenderDemo extends PApplet {
 	public static int PROJECTOR_WIDTH = 1024;
 	public static int PROJECTOR_HEIGHT = 786;
 	
-	KinectMsgHandler kinectReader;
+	//KinectMsgHandler kinectReader;
 	private PersonTracker tracker;
 	private HashMap<Long, Person> people = new HashMap<Long, Person>();
 	private Pattern pattern;
@@ -36,7 +36,7 @@ public class KinectRenderDemo extends PApplet {
 	private int wait = 1000;
 	private int time = Integer.MAX_VALUE;
 
-	//TCPBodyReceiver kinectReader;
+	TCPBodyReceiver kinectReader;
 	public static float PROJECTOR_RATIO = (float)PROJECTOR_HEIGHT/(float)PROJECTOR_WIDTH;
 
 	public void createWindow(boolean useP2D, boolean isFullscreen, float windowsScale) {
@@ -72,32 +72,32 @@ public class KinectRenderDemo extends PApplet {
 		 * use this code to run your PApplet from data recorded by recorder 
 		 */
 		
-		String filename = "bodyPose.kinect";
-		int loopCnt = -1; // use negative number to loop forever
-		try {
-			System.out.println("Trying to read " + filename + " loops:"  +loopCnt);
-			kinectReader = new PoseFileReader(filename, loopCnt);
-		} catch (FileNotFoundException e) {
-			System.out.println("Unable to open file: " + filename);
-		}
-
-		
-		try {
-			kinectReader.start();
-		} catch (IOException e) {
-			System.out.println("Unable to start kinect reader");
-			exit();
-		}
-
-		tracker = new PersonTracker();	
-		pattern = new Pattern(); //set up new voronoi pattern
-//		kinectReader = new TCPBodyReceiver("138.110.92.93", 8008);
+//		String filename = "bodyPose.kinect";
+//		int loopCnt = -1; // use negative number to loop forever
+//		try {
+//			System.out.println("Trying to read " + filename + " loops:"  +loopCnt);
+//			kinectReader = new PoseFileReader(filename, loopCnt);
+//		} catch (FileNotFoundException e) {
+//			System.out.println("Unable to open file: " + filename);
+//		}
+//
+//		
 //		try {
 //			kinectReader.start();
 //		} catch (IOException e) {
-//			System.out.println("Unable to connect to kinect server");
+//			System.out.println("Unable to start kinect reader");
 //			exit();
 //		}
+
+		tracker = new PersonTracker();	
+		pattern = new Pattern(); //set up new voronoi pattern
+		kinectReader = new TCPBodyReceiver("138.110.92.93", 8008);
+		try {
+			kinectReader.start();
+		} catch (IOException e) {
+			System.out.println("Unable to connect to kinect server");
+			exit();
+		}
 
 	}
 	public void draw(){
@@ -135,7 +135,7 @@ public class KinectRenderDemo extends PApplet {
 			HashMap<Long, Body> idBodyMap = tracker.getPeople();
 			for(Entry<Long, Body> entry : idBodyMap.entrySet()) {
 					Body body = entry.getValue();
-					Person person = people.get(entry.getKey()); 
+					Person person = people.get(entry.getKey());
 					if (body != null && person != null) {
 						if (person1 == null && person != person2) {
 							person1 = person;
@@ -151,25 +151,35 @@ public class KinectRenderDemo extends PApplet {
 				}
 			
 			if (person1 != null && person2 != null) { //if two people are available
-				if (touchingHands(person1, person2)) { //if their hands are touching then change color constantly
+				if (touchingBothHands(person1, person2)) {
+					pattern.drawHodingTwoHands(this, person1, person2);
+				}
+				else if (touchingHands(person1, person2)) { //if their hands are touching then change color constantly
 					System.out.println("Fuck they are holding hands how sweet");
 					//TODO: Implement a wait time to prevent epilepsy - as of now the colors is changing too fast
-					
 					pattern.drawVoronoiRandom(this); //changing the color constantly
 				}
 				else { //else the points can stick to them
 					pattern.drawTwoPeople(this, person1, person2);
-				}	
+				}
+				person1.draw(this);
+				person2.draw(this);
 			}
 			//if one person is available then draw one person
 			else if (person1 == null && person2 != null || person1 != null && person2 == null) {
-				if (person1 != null) pattern.drawOnePerson(this, person1);
-				else if (person2 != null) pattern.drawOnePerson(this, person2);
+				if (person1 != null) {
+					pattern.drawOnePerson(this, person1);
+					person1.draw(this);
+				}
+				else if (person2 != null) {
+					pattern.drawOnePerson(this, person2);
+					person2.draw(this);
+				}
 				
 			}
 			//if there's nobody on the screen then render the background only
 			else if (person1 == null && person2 == null) {
-				pattern.drawNoBody(this); 
+				pattern.drawNoBody(this);
 			}
 
 //			if (person1 != null && person2 != null){
@@ -206,8 +216,24 @@ public class KinectRenderDemo extends PApplet {
 		return false;
 	}
 	
+	public boolean touchingBothHands (Person person1, Person person2) {
+		PVector handL1 = person1.getHandLeft();
+		PVector handR1 = person1.getHandRight();
+		PVector handL2 = person2.getHandLeft();
+		PVector handR2 = person2.getHandRight();
+		
+		// if people holds one hands
+		if (handL1 != null && handR1 != null && handL2 != null && handR2 != null) {
+			if (touches(handL1,handR2) && touches(handR1,handL2) ||
+					touches(handL1,handL2) && touches(handR1,handR2)) {
+					 return true;
+				}
+		}
+		return false;
+	}
+	
 	/**
-	 * Method to detect if two vectors are close to eachother
+	 * Method to detect if two vectors are close to each other
 	 * @param p1
 	 * @param p2
 	 * @return
