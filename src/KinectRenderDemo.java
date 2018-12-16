@@ -209,7 +209,7 @@ public class KinectRenderDemo extends PApplet {
 		// if people holds one hands
 		if (handL1 != null && handR1 != null && handL2 != null && handR2 != null) {
 			if (touches(handL1,handR2) || touches(handR1,handL2) ||
-					touches(handL1,handL2) & touches(handR1,handR2)) {
+					touches(handL1,handL2) || touches(handR1,handR2)) {
 					 return true;
 				}
 		}

@@ -12,6 +12,7 @@ public class Pattern {
 	private final int NUMPOINTS = 1000;
 	private float[][] voronoiPoints = new float[NUMPOINTS][2];
 	private Random random = new Random();
+	public float stroke = .02f;
 	
 	private final double THREADHOLD = 0.05f;
 	
@@ -82,9 +83,13 @@ public class Pattern {
 		voronoiRegions = voronoi.getRegions();
 	}
 	
+	public void setStrokeWeight(float strokeWeight) {
+		this.stroke = strokeWeight;
+	}
+	
 	public void drawVoronoiRandom(PApplet app) {
 		app.stroke(0);
-		app.strokeWeight(.02f);
+		app.strokeWeight(stroke);
 		for(int i = 0; i < voronoiRegions.length; i++){
 			color = app.color(app.random(0, 255), app.random(0,255), app.random(0,255));
 			app.fill(color);
@@ -95,7 +100,7 @@ public class Pattern {
 	public void drawVoronoi(PApplet app) {
 		app.fill(255,100,0);
 		app.stroke(0);
-		app.strokeWeight(.02f);
+		app.strokeWeight(stroke);
 		for(int i = 0; i < voronoiRegions.length; i++){
 			voronoiRegions[i].draw(app); // draw this shape
 		}	
