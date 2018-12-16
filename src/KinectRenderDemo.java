@@ -27,7 +27,7 @@ public class KinectRenderDemo extends PApplet {
 	public static int PROJECTOR_WIDTH = 1024;
 	public static int PROJECTOR_HEIGHT = 786;
 	
-	//KinectMsgHandler kinectReader;
+//	KinectMsgHandler kinectReader;
 	private PersonTracker tracker;
 	private HashMap<Long, Person> people = new HashMap<Long, Person>();
 	private Pattern pattern;
@@ -169,11 +169,11 @@ public class KinectRenderDemo extends PApplet {
 			else if (person1 == null && person2 != null || person1 != null && person2 == null) {
 				if (person1 != null) {
 					pattern.drawOnePerson(this, person1);
-					person1.draw(this);
+//					person1.draw(this);
 				}
 				else if (person2 != null) {
 					pattern.drawOnePerson(this, person2);
-					person2.draw(this);
+//					person2.draw(this);
 				}
 				
 			}

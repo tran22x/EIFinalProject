@@ -1,10 +1,13 @@
 package voronoi;
 
+import java.util.Arrays;
+
 import processing.core.*;
 
 public class MPolygon {
 
 	float[][] coords;
+	float[][] initCords;
 	int count;
 	
 	public MPolygon(){
@@ -13,12 +16,15 @@ public class MPolygon {
 
 	public MPolygon(int points){
 		coords = new float[points][2];
+		initCords = new float[points][2];
 		count = 0;
 	}
 
 	public void add(float x, float y){
 		coords[count][0] = x;
 		coords[count][1] = y;
+		initCords[count][0] = x;
+		initCords[count][1] = y;
 		count++;
 	}
 
@@ -38,8 +44,16 @@ public class MPolygon {
 		return count;
 	}
 
+	public void setCoordis(float[][] coords) {
+		this.coords = coords;
+	}
+	
 	public float[][] getCoords(){
 		return coords;
+	}
+	
+	public float[][] getInitCoords(){
+		return this.initCords;
 	}
 	
 	/**
