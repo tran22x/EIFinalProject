@@ -25,55 +25,55 @@ public class Pattern {
 		setUpVoronoi();
 	}
 	
-//	public void drawTwoPeople(PApplet app, Person person1, Person person2) {
-//		if (person1 != null) {
-//			//for (PVector joint : person.getAllJoints()) {
-//			PVector[] j = person1.getAllJoints();
-////			int jointDetected = 5;
-//			for (int i = 0; i < j.length; i++) { //limits the number of joints that can be attached to - this prevents points being shifted constantly between 2 joints
-////				if (j[i] != null && jointDetected > 0) {
-//				if (j[i] != null) {
-//						findClosestPoint(j[i]);
-////						jointDetected--; 
-//			}
-//		}
-//	}
-//		if (person2 != null) {
-//			//for (PVector joint : person.getAllJoints()) {
-//			PVector[] j = person2.getAllJoints();
-////			int jointDetected = 5;
-//			for (int i = 0; i < j.length; i++) { //limits the number of joints that can be attached to
-////				if (j[i] != null && jointDetected > 0) {
-//				if (j[i] != null) {
-//					findClosestPoint(j[i]);
-////					jointDetected--;
-//			}
-//			}
-//		}
-//		drawVoronoi(app);
-//	}
-	
 	public void drawTwoPeople(PApplet app, Person person1, Person person2) {
 		if (person1 != null) {
+			//for (PVector joint : person.getAllJoints()) {
 			PVector[] j = person1.getAllJoints();
-			for (int i = 0; i < j.length; i++) {
+//			int jointDetected = 5;
+			for (int i = 0; i < j.length; i++) { //limits the number of joints that can be attached to - this prevents points being shifted constantly between 2 joints
+//				if (j[i] != null && jointDetected > 0) {
 				if (j[i] != null) {
-					resetPoint(j[i]);
-					drawVoronoi(app);
-				}
+						findClosestPoint(j[i]);
+//						jointDetected--; 
 			}
 		}
+	}
 		if (person2 != null) {
+			//for (PVector joint : person.getAllJoints()) {
 			PVector[] j = person2.getAllJoints();
-			for (int i = 0; i < j.length; i++) {
+//			int jointDetected = 5;
+			for (int i = 0; i < j.length; i++) { //limits the number of joints that can be attached to
+//				if (j[i] != null && jointDetected > 0) {
 				if (j[i] != null) {
-					resetPoint(j[i]);
-					drawVoronoi(app);
-				}
+					findClosestPoint(j[i]);
+//					jointDetected--;
+			}
 			}
 		}
 		drawVoronoi(app);
 	}
+	
+//	public void drawTwoPeople(PApplet app, Person person1, Person person2) {
+//		if (person1 != null) {
+//			PVector[] j = person1.getAllJoints();
+//			for (int i = 0; i < j.length; i++) {
+//				if (j[i] != null) {
+//					resetPoint(j[i]);
+//					drawVoronoi(app);
+//				}
+//			}
+//		}
+//		if (person2 != null) {
+//			PVector[] j = person2.getAllJoints();
+//			for (int i = 0; i < j.length; i++) {
+//				if (j[i] != null) {
+//					resetPoint(j[i]);
+//					drawVoronoi(app);
+//				}
+//			}
+//		}
+//		drawVoronoi(app);
+//	}
 	
 	public void drawOnePerson(PApplet app, Person person) {
 		if (person != null) {
@@ -186,21 +186,21 @@ public class Pattern {
 		for (MPolygon piece : voronoiRegions) {
 			for (float[] point : piece.getCoords()) {
 				if (computeDistance(point[0], point[1], vector.x, vector.y) < THREADHOLD) {
-					PVector velocity = new PVector(point[0]-vector.x, point[1]-vector.y);
-					velocity.normalize().mult(0.002f);
-					point[0] = point[0] + velocity.x;
-					point[1] = point[1] + velocity.y;
-//					//push it away
-//					if (point[0] - vector.x > 0) {
-//						point[0] = point[0] + SHIFT_THRESHOLD;
-//					} else if (point[0] - vector.x < 0) {
-//						point[0] = point[0] - SHIFT_THRESHOLD;
-//					}
-//					if (point[1] - vector.y > 0) {
-//						point[1] = point[1] + SHIFT_THRESHOLD;
-//					} else if (point[1] - vector.y < 0) {
-//						point[1] = point[1] - SHIFT_THRESHOLD;
-//					}
+//					PVector velocity = new PVector(point[0]-vector.x, point[1]-vector.y);
+//					velocity.normalize().mult(0.002f);
+//					point[0] = point[0] + velocity.x;
+//					point[1] = point[1] + velocity.y;
+					//push it away
+					if (point[0] - vector.x > 0) {
+						point[0] = point[0] + SHIFT_THRESHOLD;
+					} else if (point[0] - vector.x < 0) {
+						point[0] = point[0] - SHIFT_THRESHOLD;
+					}
+					if (point[1] - vector.y > 0) {
+						point[1] = point[1] + SHIFT_THRESHOLD;
+					} else if (point[1] - vector.y < 0) {
+						point[1] = point[1] - SHIFT_THRESHOLD;
+					}
 				}
 			}
 		}
@@ -213,8 +213,8 @@ public class Pattern {
 				float y = voronoiRegions[i].getCoords()[j][1];
 				float initX = voronoiRegions[i].getInitCoords()[j][0];
 				float initY = voronoiRegions[i].getInitCoords()[j][1];
-				System.out.println("X:" + x);
-				System.out.println("InitX:" + initX);
+				//System.out.println("X:" + x);
+				//System.out.println("InitX:" + initX);
 				PVector velocity = new PVector(initX-x, initY-y);
 				velocity.normalize().mult(0.005f);
 				for (int limit = 0; limit < 3; limit++) {
