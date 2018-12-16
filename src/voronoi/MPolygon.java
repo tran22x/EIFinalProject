@@ -58,13 +58,13 @@ public class MPolygon {
 	
 	private boolean contains (float beginX, float beginY, float endX, float endY) {
 		for (float[] point : coords) {
-			if (beginX < point[0] && point[0] < endX && beginY < point[0] && point[0] < endY) {
+			if (beginX < point[0] && point[0] < endX && beginY < point[1] && point[1] < endY) {
 				return true;
-			} else if (beginX > point[0] && point[0] > endX && beginY > point[0] && point[0] > endY) {
+			} else if (beginX > point[0] && point[0] > endX && beginY > point[1] && point[1] > endY) {
 				return true;
-			} else if (beginX < point[0] && point[0] < endX && beginY > point[0] && point[0] > endY) {
+			} else if (beginX < point[0] && point[0] < endX && beginY > point[1] && point[1] > endY) {
 				return true;
-			} else if (beginX > point[0] && point[0] > endX && beginY < point[0] && point[0] < endY) {
+			} else if (beginX > point[0] && point[0] > endX && beginY < point[1] && point[1] < endY) {
 				return true;
 			}
 		}
