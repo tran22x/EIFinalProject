@@ -101,8 +101,6 @@ public class Pattern {
 		else if(strokeControl<=1){
 			strokeIncrease=true;
 		}
-		System.out.println(strokeControl);
-		System.out.println(strokeControl*0.001f+0.05f);
 		this.stroke = (strokeControl*0.0001f+0.01f);
 	}
 	
