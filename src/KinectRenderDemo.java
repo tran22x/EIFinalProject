@@ -27,15 +27,16 @@ public class KinectRenderDemo extends PApplet {
 	public static int PROJECTOR_WIDTH = 1024;
 	public static int PROJECTOR_HEIGHT = 786;
 	
-	//KinectMsgHandler kinectReader;
+	KinectMsgHandler kinectReader;
 	private PersonTracker tracker;
 	private HashMap<Long, Person> people = new HashMap<Long, Person>();
 	private Pattern pattern;
 	private Person person1;
 	private Person person2;
-	
+	private int wait = 1000;
+	private int time = Integer.MAX_VALUE;
 
-	TCPBodyReceiver kinectReader;
+	//TCPBodyReceiver kinectReader;
 	public static float PROJECTOR_RATIO = (float)PROJECTOR_HEIGHT/(float)PROJECTOR_WIDTH;
 
 	public void createWindow(boolean useP2D, boolean isFullscreen, float windowsScale) {
@@ -71,57 +72,60 @@ public class KinectRenderDemo extends PApplet {
 		 * use this code to run your PApplet from data recorded by recorder 
 		 */
 		
-//		String filename = "bodyPose.kinect";
-//		int loopCnt = -1; // use negative number to loop forever
-//		try {
-//			System.out.println("Trying to read " + filename + " loops:"  +loopCnt);
-//			kinectReader = new PoseFileReader(filename, loopCnt);
-//		} catch (FileNotFoundException e) {
-//			System.out.println("Unable to open file: " + filename);
-//		}
-//
-//		
-//		try {
-//			kinectReader.start();
-//		} catch (IOException e) {
-//			System.out.println("Unable to start kinect reader");
-//			exit();
-//		}
+		String filename = "bodyPose.kinect";
+		int loopCnt = -1; // use negative number to loop forever
+		try {
+			System.out.println("Trying to read " + filename + " loops:"  +loopCnt);
+			kinectReader = new PoseFileReader(filename, loopCnt);
+		} catch (FileNotFoundException e) {
+			System.out.println("Unable to open file: " + filename);
+		}
 
-		 
-		tracker = new PersonTracker();	
-		pattern = new Pattern();
-		kinectReader = new TCPBodyReceiver("138.110.92.93", 8008);
+		
 		try {
 			kinectReader.start();
 		} catch (IOException e) {
-			System.out.println("Unable to connect to kinect server");
+			System.out.println("Unable to start kinect reader");
 			exit();
 		}
+
+		tracker = new PersonTracker();	
+		pattern = new Pattern(); //set up new voronoi pattern
+//		kinectReader = new TCPBodyReceiver("138.110.92.93", 8008);
+//		try {
+//			kinectReader.start();
+//		} catch (IOException e) {
+//			System.out.println("Unable to connect to kinect server");
+//			exit();
+//		}
 
 	}
 	public void draw(){
 		setScale(.5f);
 		background(200,200,200);
 		KinectBodyData bodyData = kinectReader.getNextData();
-		if(bodyData == null) return;
-		
-		// TODO: find and assign person1 and person2
+		if(bodyData == null){
+			pattern.drawNoBody(this);
+			return;
+		}
+
 		if(bodyData != null) {
 			tracker.update(bodyData);
 			for(Long id : tracker.getEnters()) {
-					if (people.size() < 2) { //only recognize 2 people
+					if (person1 == null || person2 == null) { //only recognize 2 people
 						people.put(id, new Person(id, this));
 					}	
 			}
 			for(Long id: tracker.getExits()) {
-				if (people.get(id) != null && people.get(id).equals(person1)) {
+				if (people.get(id) != null && people.get(id).equals(person1)) { //when person exits remove from hashmap and set person to null
 					people.remove(id);
 					person1 = null;
+					System.out.println("Person 1 removed");
 				}
 				else if (people.get(id) != null && people.get(id).equals(person2)){
 					people.remove(id);
 					person2 = null;
+					System.out.println("Person 2 removed");
 				}
 				if (people.size() == 0) { //if the last person leaves then reset the voronoi
 					pattern.resetVoronoi(this);
@@ -133,26 +137,38 @@ public class KinectRenderDemo extends PApplet {
 					Body body = entry.getValue();
 					Person person = people.get(entry.getKey()); 
 					if (body != null && person != null) {
-						if (person1 == null) {
+						if (person1 == null && person != person2) {
 							person1 = person;
-							System.out.println("person1 added");
+							//System.out.println("person1 added");
 						}
-						else if (person2 == null) {
-							System.out.println("person2 added");
+						else if (person2 == null && person != person1) {
+							//System.out.println("person2 added");
 							person2 = person;
 						}
 						person.setBody(body); //set body and populate all joints
-						pattern.drawOnePerson(this, person);
-						person.draw(this);
 						}
 					}
 				}
 			
-			if (person1 != null && person2 != null && touchingHands(person1, person2)) {
-				System.out.println("Fuck they are holding hands how sweet");
-				pattern.resetVoronoi(this); //constantly redrawing the background
-			} 
-			else if (people.size() == 0) {
+			if (person1 != null && person2 != null) { //if two people are available
+				if (touchingHands(person1, person2)) { //if their hands are touching then change color constantly
+					System.out.println("Fuck they are holding hands how sweet");
+					//TODO: Implement a wait time to prevent epilepsy - as of now the colors is changing too fast
+					
+					pattern.drawVoronoiRandom(this); //changing the color constantly
+				}
+				else { //else the points can stick to them
+					pattern.drawTwoPeople(this, person1, person2);
+				}	
+			}
+			//if one person is available then draw one person
+			else if (person1 == null && person2 != null || person1 != null && person2 == null) {
+				if (person1 != null) pattern.drawOnePerson(this, person1);
+				else if (person2 != null) pattern.drawOnePerson(this, person2);
+				
+			}
+			//if there's nobody on the screen then render the background only
+			else if (person1 == null && person2 == null) {
 				pattern.drawNoBody(this); 
 			}
 
@@ -168,6 +184,12 @@ public class KinectRenderDemo extends PApplet {
 
 		}
 	
+	/**
+	 * Method to detect if people's hands are touching
+	 * @param person1
+	 * @param person2
+	 * @return
+	 */
 	public boolean touchingHands (Person person1, Person person2) {
 		PVector handL1 = person1.getHandLeft();
 		PVector handR1 = person1.getHandRight();
@@ -184,8 +206,14 @@ public class KinectRenderDemo extends PApplet {
 		return false;
 	}
 	
+	/**
+	 * Method to detect if two vectors are close to eachother
+	 * @param p1
+	 * @param p2
+	 * @return
+	 */
 	public boolean touches(PVector p1, PVector p2) {
-		if (Math.abs(p1.x-p2.x)<0.25f & Math.abs(p2.y-p2.y)<0.25f) {
+		if (Math.abs(p1.x-p2.x)<0.2f & Math.abs(p2.y-p2.y)<0.2f) {
 			return true;
 		}
 			return false;

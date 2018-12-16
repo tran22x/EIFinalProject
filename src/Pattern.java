@@ -1,5 +1,3 @@
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Random;
 import processing.core.PApplet;
 import processing.core.PVector;
@@ -7,17 +5,19 @@ import voronoi.Voronoi;
 import voronoi.MPolygon;
 
 public class Pattern {
+	private static final float SHIFT_THRESHOLD = 0.005f;
 	private Person person1;
 	private Person person2;
 	private Voronoi voronoi;
+	private int color;
 	private MPolygon[] voronoiRegions;
-	private final int NUMPOINTS = 150;
+	private final int NUMPOINTS = 200;
 	private float[][] voronoiPoints = new float[NUMPOINTS][2];
 	private float[][] voronoiEdges;
 	private Random random = new Random();
-	private Map<Integer, Integer> m = new HashMap<>();
 	
 	private final double THREADHOLD = 0.05f;
+	
 	public Pattern (Person person1, Person person2) {
 		this.person1 = person1;
 		this.person2 = person2;
@@ -28,20 +28,38 @@ public class Pattern {
 	}
 	
 	public void drawTwoPeople(PApplet app, Person person1, Person person2) {
-		
+		if (person1 != null) {
+			//for (PVector joint : person.getAllJoints()) {
+			PVector[] j = person1.getAllJoints();
+			int jointDetected = 5;
+			for (int i = 0; i < j.length; i++) { //limits the number of joints that can be attached to - this prevents points being shifted constantly between 2 joints
+				if (j[i] != null && jointDetected > 0) {
+						findClosestPoint(j[i]);
+						jointDetected--; 
+			}
+		}
+	}
+		if (person2 != null) {
+			//for (PVector joint : person.getAllJoints()) {
+			PVector[] j = person2.getAllJoints();
+			int jointDetected = 5;
+			for (int i = 0; i < j.length; i++) { //limits the number of joints that can be attached to
+				if (j[i] != null && jointDetected > 0) {
+						findClosestPoint(j[i]);
+						jointDetected--;
+			}
+			}
+		}
+		drawVoronoi(app);
 	}
 	
 	public void drawOnePerson(PApplet app, Person person) {
 		if (person != null) {
-			//for (PVector joint : person.getAllJoints()) {
 			PVector[] j = person.getAllJoints();
 			for (int i = 0; i < j.length; i++) {
 				if (j[i] != null) {
-					//if (!m.containsKey(i) || m.get(i) < 3) { //if there are fewer than 3 points mapped to the same body part
-						findClosestPoint(j[i], i);
-					//}	
+						pushClosestPoint(j[i], i);
 			}
-			//}	
 			drawVoronoi(app);
 			}
 		}
@@ -73,6 +91,16 @@ public class Pattern {
 		voronoiEdges = voronoi.getEdges();
 	}
 	
+	public void drawVoronoiRandom(PApplet app) {
+		app.stroke(0);
+		app.strokeWeight(.02f);
+		for(int i = 0; i < voronoiRegions.length; i++){
+			color = app.color(app.random(0, 255), app.random(0,255), app.random(0,255));
+			app.fill(color);
+			voronoiRegions[i].draw(app); // draw this shape
+		}	
+	}
+	
 	public void drawVoronoi(PApplet app) {
 		app.fill(255,100,0);
 		app.stroke(0);
@@ -96,26 +124,36 @@ public class Pattern {
 //		}
 	}
 	
-	public void findClosestPoint(PVector vector, int bodyPartid) {
+	public void findClosestPoint(PVector vector) {
 		for (MPolygon piece : voronoiRegions) {
 			for (float[] point : piece.getCoords()) {
 				if (computeDistance(point[0], point[1], vector.x, vector.y) < THREADHOLD) {
-//					if (!m.containsKey(bodyPartid)) {
-//						point[0] = vector.x;
-//						point[1] = vector.y;
-//						m.put(bodyPartid, 1); // id is key, num points mapped to that point is value
-//					}
-//					else {
 						point[0] = vector.x;
 						point[1] = vector.y;
-//						int count = m.get(bodyPartid)+1;
-//						m.replace(bodyPartid, count);
-//					}	
 					}
 				}
 			}
 		}
 	
+	public void pushClosestPoint (PVector vector, int bodyPartid) {
+		for (MPolygon piece : voronoiRegions) {
+			for (float[] point : piece.getCoords()) {
+				if (computeDistance(point[0], point[1], vector.x, vector.y) < THREADHOLD) {
+					//push it away
+					if (point[0] - vector.x > 0) {
+						point[0] = point[0] + SHIFT_THRESHOLD;
+					} else if (point[0] - vector.x < 0) {
+						point[0] = point[0] - SHIFT_THRESHOLD;
+					}
+					if (point[1] - vector.y > 0) {
+						point[1] = point[1] + SHIFT_THRESHOLD;
+					} else if (point[1] - vector.y < 0) {
+						point[1] = point[1] - SHIFT_THRESHOLD;
+					}
+				}
+			}
+		}
+	}
 	public float computeDistance (float firstX, float firstY, float secondX, float secondY) {
 		return ((firstX - secondX)*(firstX-secondX) + (firstY - secondY)*(firstY - secondY));
 	}
