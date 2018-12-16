@@ -17,6 +17,8 @@ public class Pattern {
 	float strokeControl = 1;
 	boolean strokeIncrease = true;
 	
+	private int[] colorStack;
+	
 	private final double THREADHOLD = 0.05f;
 	
 	public Pattern() {
@@ -84,6 +86,7 @@ public class Pattern {
 		}
 		voronoi = new Voronoi(voronoiPoints);
 		voronoiRegions = voronoi.getRegions();
+		colorStack = new int [voronoiRegions.length];
 	}
 	
 	public void setStrokeWeight() {
@@ -108,8 +111,11 @@ public class Pattern {
 		app.stroke(0);
 		app.strokeWeight(stroke);
 		for(int i = 0; i < voronoiRegions.length; i++){
+			if(app.frameCount%15==0) {
 			color = app.color(app.random(0, 255), app.random(0,255), app.random(0,255));
-			app.fill(color);
+			colorStack[i] = color;
+			}
+			app.fill(colorStack[i]);
 			voronoiRegions[i].draw(app); // draw this shape
 		}
 	}
